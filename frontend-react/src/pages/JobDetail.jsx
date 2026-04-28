@@ -35,7 +35,9 @@ import {
   Upload as UploadIcon,
   AccountBalanceWallet as PaymentIcon,
   Event as EventIcon,
-  Note as NoteIcon
+  Note as NoteIcon,
+  Phone as PhoneIcon,
+  Visibility as ViewIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import api from '../api';
@@ -134,7 +136,28 @@ export default function JobDetail() {
 
             {/* Quick Actions */}
             <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-              {job.status !== 'Completed' && job.status !== 'Invoiced' && (
+              {/* Status-based actions */}
+              {job.status === 'Pending' && (
+                <Button variant="contained" color="secondary" startIcon={<MoneyIcon />} onClick={() => handleStatusChange('Quote')}>
+                  Send Quote
+                </Button>
+              )}
+              {job.status === 'Quote' && (
+                <Button variant="contained" color="primary" startIcon={<CompleteIcon />} onClick={() => handleStatusChange('Booked')}>
+                  Book Job
+                </Button>
+              )}
+              {job.status === 'Booked' && !job.Staff && (
+                <Button variant="outlined" startIcon={<PersonIcon />} onClick={() => navigate(`/jobs/${jobId}/edit`)}>
+                  Assign Staff
+                </Button>
+              )}
+              {job.status === 'Booked' && job.Staff && (
+                <Button variant="contained" startIcon={<ScheduleIcon />} onClick={() => handleStatusChange('In Progress')}>
+                  Start Work
+                </Button>
+              )}
+              {job.status === 'In Progress' && (
                 <Button variant="contained" startIcon={<CompleteIcon />} onClick={() => handleStatusChange('Completed')}>
                   Mark Complete
                 </Button>
@@ -144,8 +167,15 @@ export default function JobDetail() {
                   Create Invoice
                 </Button>
               )}
+              {job.status === 'Invoiced' && (
+                <Button variant="outlined" startIcon={<ViewIcon />} onClick={() => navigate('/invoices')}>
+                  View Invoice
+                </Button>
+              )}
+
+              {/* Always available actions */}
               <Button variant="outlined" startIcon={<EditIcon />} onClick={() => navigate(`/jobs/${jobId}/edit`)}>
-                Edit
+                Edit Job
               </Button>
             </Box>
 
@@ -155,6 +185,9 @@ export default function JobDetail() {
         <Box sx={{ position: 'relative', pl: 2, borderLeft: 2, borderColor: 'divider' }}>
           {statusFlow.map((status, idx) => {
             const isCompleted = idx <= currentIndex;
+            const isCurrent = idx === currentIndex;
+            const canAdvance = idx === currentIndex + 1; // Next status
+
             return (
               <Box key={status} sx={{ position: 'relative', mb: 3, '&:last-child': { mb: 0 } }}>
                 <Avatar
@@ -164,14 +197,35 @@ export default function JobDetail() {
                     width: 28,
                     height: 28,
                     fontSize: 14,
-                    bgcolor: isCompleted ? 'success.main' : 'grey.300'
+                    bgcolor: isCompleted ? 'success.main' : isCurrent ? 'primary.main' : 'grey.300'
                   }}
                 >
                   {idx + 1}
                 </Avatar>
-                <Typography variant="body2" color={isCompleted ? 'text.primary' : 'text.secondary'} sx={{ fontWeight: isCompleted ? 600 : 400 }}>
-                  {status}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color={isCompleted ? 'text.primary' : isCurrent ? 'primary' : 'text.secondary'}
+                    sx={{ fontWeight: isCompleted || isCurrent ? 600 : 400 }}
+                  >
+                    {status}
+                  </Typography>
+                  {canAdvance && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleStatusChange(status)}
+                      sx={{ minWidth: 'auto', px: 1, py: 0.5 }}
+                    >
+                      Advance
+                    </Button>
+                  )}
+                </Box>
+                {isCurrent && (
+                  <Typography variant="caption" color="primary" sx={{ ml: 2, fontStyle: 'italic' }}>
+                    Current Status
+                  </Typography>
+                )}
               </Box>
             );
           })}
@@ -231,7 +285,7 @@ export default function JobDetail() {
               {job.Invoice && (
                 <Box>
                   <Typography variant="caption" color="text.secondary">Invoice</Typography>
-                  <Typography variant="body2">#{job.Invoice.id} - ${job.Invoice.total.toFixed(2)} ({job.Invoice.status})</Typography>
+                  <Typography variant="body2">#{job.Invoice.id} - ${parseFloat(job.Invoice.total).toFixed(2)} ({job.Invoice.status})</Typography>
                 </Box>
               )}
             </Box>

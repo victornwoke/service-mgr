@@ -105,7 +105,7 @@ export default function CustomerForm() {
       </Breadcrumbs>
 
       <Paper sx={{ p: 3, maxWidth: 500, margin: '0 auto' }}>
-        <Typography variant="h5" gutterBottom center>
+        <Typography variant="h5" gutterBottom align="center">
           {customerId === 'new' ? 'Create Customer' : 'Edit Customer'}
         </Typography>
         <Divider sx={{ mb: 2 }} />

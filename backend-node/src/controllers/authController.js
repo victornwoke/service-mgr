@@ -27,6 +27,13 @@ const handleError = (res, err) => {
       details: err.details.map(detail => detail.message)
     });
   }
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    return res.status(409).json({
+      code: 'CONFLICT',
+      message: 'User with this email already exists',
+      details: 'Please use a different email address'
+    });
+  }
   return res.status(500).json({
     code: 'INTERNAL_ERROR',
     message: 'Internal Server Error',

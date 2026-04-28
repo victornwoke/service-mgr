@@ -45,7 +45,7 @@ export default function Invoices() {
     }
   };
 
-  const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(amount) || 0);
   const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString() : '-';
 
   const handleStatusToggle = async (invoice) => {

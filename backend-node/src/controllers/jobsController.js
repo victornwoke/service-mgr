@@ -15,6 +15,15 @@ const jobSchema = Joi.object({
   notes: Joi.string().allow('').allow(null)
 });
 
+const updateJobSchema = Joi.object({
+  customerId: Joi.number().integer().positive(),
+  staffId: Joi.number().integer().positive().allow(null).allow(''),
+  service: Joi.string().min(1).max(100),
+  status: Joi.string().valid('Pending', 'Quote', 'Booked', 'In Progress', 'Completed', 'Invoiced'),
+  scheduledAt: Joi.date().iso(),
+  notes: Joi.string().allow('').allow(null)
+});
+
 const handleError = (res, err) => {
   console.error(err);
   if (err.isJoi) {
@@ -166,7 +175,7 @@ exports.createJob = async (req, res) => {
 
 exports.updateJob = async (req, res) => {
   try {
-    const { error, value } = jobSchema.validate(req.body);
+    const { error, value } = updateJobSchema.validate(req.body);
     if (error) {
       throw error;
     }

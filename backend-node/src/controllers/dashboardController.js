@@ -129,10 +129,10 @@ exports.getCustomer360 = async (req, res) => {
           attributes: ['id', 'service', 'status', 'scheduledAt', 'notes', 'createdAt'],
           include: [
             { model: Staff, attributes: ['id', 'name'] },
-            { 
-              model: Invoice, 
+            {
+              model: Invoice,
               attributes: ['id', 'total', 'status', 'issuedAt'],
-              include: ['Payment']
+              include: [{ model: Payment }]
             }
           ],
           order: [['createdAt', 'DESC']]

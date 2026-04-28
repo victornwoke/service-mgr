@@ -1,5 +1,5 @@
 // src/controllers/customersController.js
-const { Customer, Job } = require('../models');
+const { Customer, Job, Invoice } = require('../models');
 const { auditLog, captureChanges } = require('../services/auditService');
 const Joi = require('joi');
 const { Op } = require('sequelize');
@@ -22,11 +22,18 @@ const handleError = (res, err) => {
       details: err.details.map(detail => detail.message)
     });
   }
-  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
+  if (err.name === 'SequelizeValidationError') {
     return res.status(400).json({
       code: 'VALIDATION_ERROR',
       message: 'Validation failed',
       details: err.errors.map(e => e.message)
+    });
+  }
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    return res.status(409).json({
+      code: 'CONFLICT',
+      message: 'Customer with this email already exists',
+      details: 'Please use a different email address'
     });
   }
   return res.status(500).json({
@@ -89,7 +96,7 @@ exports.getCustomerById = async (req, res) => {
       include: [{
         model: Job,
         attributes: ['id', 'service', 'status', 'scheduledAt', 'notes'],
-        include: ['Invoice']
+        include: [{ model: Invoice }]
       }]
     });
     if (!customer) {

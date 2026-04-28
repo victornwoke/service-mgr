@@ -87,7 +87,7 @@ export default function Dashboard() {
           <Card><CardContent><Typography color="textSecondary" gutterBottom>Today's Jobs</Typography><Typography variant="h4">{stats.dailyJobs}</Typography></CardContent></Card>
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={2}>
-          <Card><CardContent><Typography color="textSecondary" gutterBottom>Monthly Revenue</Typography><Typography variant="h4">${stats.monthlyRevenue.toFixed(2)}</Typography></CardContent></Card>
+          <Card><CardContent><Typography color="textSecondary" gutterBottom>Monthly Revenue</Typography><Typography variant="h4">${parseFloat(stats.monthlyRevenue || 0).toFixed(2)}</Typography></CardContent></Card>
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={2}>
           <Card><CardContent><Typography color="textSecondary" gutterBottom>Unpaid Invoices</Typography><Typography variant="h4" color="error">{stats.unpaidInvoices}</Typography></CardContent></Card>

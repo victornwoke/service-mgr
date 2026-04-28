@@ -31,7 +31,8 @@ import {
   Description as DescriptionIcon,
   AttachMoney as MoneyIcon,
   CalendarToday as CalendarIcon,
-  ArrowBack as BackIcon
+  ArrowBack as BackIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
@@ -245,7 +246,7 @@ export default function CustomerDetail() {
                         <TableRow key={job.Invoice.id}>
                           <TableCell>#{job.Invoice.id}</TableCell>
                           <TableCell>{job.service}</TableCell>
-                          <TableCell>${job.Invoice.total.toFixed(2)}</TableCell>
+                          <TableCell>${parseFloat(job.Invoice.total).toFixed(2)}</TableCell>
                           <TableCell>
                             <Chip label={job.Invoice.status} size="small" color={job.Invoice.status === 'Paid' ? 'success' : 'error'} />
                           </TableCell>

@@ -11,6 +11,7 @@ import JobDetail from './pages/JobDetail';
 import JobForm from './pages/JobForm';
 import Staff from './pages/Staff';
 import Invoices from './pages/Invoices';
+import InvoiceForm from './pages/InvoiceForm';
 import Settings from './pages/Settings';
 import Schedule from './pages/Schedule';
 import Register from './pages/Register';
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/jobs/:jobId" element={<JobDetail />} />
             <Route path="/staff" element={<Staff />} />
             <Route path="/invoices" element={<Invoices />} />
+            <Route path="/invoices/new" element={<InvoiceForm />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>

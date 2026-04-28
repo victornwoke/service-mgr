@@ -76,12 +76,15 @@ exports.createInvoice = async (req, res) => {
       throw error;
     }
     const invoice = await Invoice.create(value);
-    
+
+    // Update job status to 'Invoiced'
+    await Job.update({ status: 'Invoiced' }, { where: { id: value.jobId } });
+
     // Add job details to response
     const invoiceWithJob = await Invoice.findByPk(invoice.id, {
       include: [{ model: Job, attributes: ['id', 'service'] }]
     });
-    
+
     // Audit log
     await auditLog({
       userId: req.user.id,
@@ -92,7 +95,7 @@ exports.createInvoice = async (req, res) => {
       ipAddress: req.ip,
       userAgent: req.get('User-Agent')
     });
-    
+
     res.status(201).json(invoiceWithJob);
   } catch (err) {
     handleError(res, err);

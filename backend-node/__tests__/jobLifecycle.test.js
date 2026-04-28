@@ -53,13 +53,13 @@ describe('Job Lifecycle & Task Scheduling', () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.data.service).toBe('Test Service');
+    expect(res.body.service).toBe('Test Service');
 
     // Verify a task was created
     const tasks = await Task.findAll();
     expect(tasks.length).toBe(1);
     expect(tasks[0].type).toBe('job_reminder');
-    expect(tasks[0].payload.jobId).toBe(res.data.id);
+    expect(tasks[0].payload.jobId).toBe(res.body.id);
   }, 20000);
 
   test('PATCH /api/v1/jobs/:id to Completed schedules follow-up task', async () => {
@@ -77,7 +77,7 @@ describe('Job Lifecycle & Task Scheduling', () => {
       .send({ status: 'Completed' });
 
     expect(res.status).toBe(200);
-    expect(res.data.status).toBe('Completed');
+    expect(res.body.status).toBe('Completed');
 
     // Verify follow-up task created
     const tasks = await Task.findAll();

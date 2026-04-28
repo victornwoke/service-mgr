@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: 'http://localhost:8081/api/v1',
 });
 
 // Add a request interceptor to include JWT if present

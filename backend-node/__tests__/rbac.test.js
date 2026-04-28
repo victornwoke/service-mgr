@@ -41,7 +41,7 @@ describe('RBAC Permissions', () => {
       .send({ name: 'New Staff', email: 'new@test.com', role: 'Staff', password: 'password123' });
 
     expect(res.status).toBe(201);
-    expect(res.data.name).toBe('New Staff');
+    expect(res.body.name).toBe('New Staff');
   });
 
   test('Manager cannot create staff (requires Admin)', async () => {
