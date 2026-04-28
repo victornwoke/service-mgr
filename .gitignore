@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.env
+*.log
+.DS_Store
+__pycache__/
+venv/
+.pytest_cache/
+node_modules/
+*.tar
+*.pid
+.DS_Store
+venv/
+.venv/
+__pycache__/
+.env

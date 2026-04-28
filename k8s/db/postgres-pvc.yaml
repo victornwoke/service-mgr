@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: service-mgr-postgres-pvc
+  namespace: service-mgr
+spec:
+  storageClassName: local-path 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+

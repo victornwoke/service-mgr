@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-api
+  namespace: service-mgr
+spec:
+  containers:
+  - name: debug
+    image: sbms-api:latest
+    command: ["/bin/sh", "-c", "env && sleep 300"]
+    envFrom:
+    - configMapRef:
+        name: service-mgr-config
+    - secretRef:
+        name: service-mgr-db-secret
+  restartPolicy: Never

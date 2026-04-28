@@ -1,0 +1,20 @@
+# Dependencies (Don't copy these, let Docker install them)
+node_modules/
+venv/
+.venv/
+__pycache__/
+
+# Build outputs
+dist/
+build/
+*.tar
+
+# Git and IDE junk
+.git
+.gitignore
+.vscode
+.DS_Store
+
+# Docker files themselves
+Dockerfile
+.dockerignore

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-mgr-postgres
+  namespace: service-mgr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-mgr-postgres
+  template:
+    metadata:
+      labels:
+        app: service-mgr-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: service-mgr-db-secret
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: service-mgr-postgres-pvc
+
