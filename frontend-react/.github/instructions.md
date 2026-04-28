@@ -1,4 +1,4 @@
-# Copilot Instructions for Service Manager Frontend (React)
+# Instructions for Service Manager Frontend (React)
 
 ## Project Overview
 
