@@ -7,6 +7,7 @@ RUN npm install --production
 
 COPY . .
 
+# Expose port 8081 for the API
 EXPOSE 8081
 
 CMD ["npm", "start"]

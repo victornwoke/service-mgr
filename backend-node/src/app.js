@@ -1,99 +1,59 @@
 // src/app.js
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const apiRouter = require('./routes');
 const { sequelize } = require('./models');
+const { generalLimiter } = require('./middleware/rateLimit');
+const { requestLogger, recordMetrics } = require('./middleware/logger');
+const { getMetrics } = require('./services/metrics');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Security middleware
-const helmet = require('helmet');
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // allow inline scripts; tighten later with nonce/hash
-      styleSrc: ["'self'", "'unsafe-inline'"], // MUI uses inline styles; tighten later
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "http://localhost:3000", "http://localhost:8081"],
-      fontSrc: ["'self'", "https:"],
-      objectSrc: ["'none'"],
-      frameAncestors: ["'none'"]
-    }
-  }
-}));
-
-// CORS
-const cors = require('cors');
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-// Rate limiting for API endpoints only
-const { generalLimiter } = require('./middleware/rateLimit');
-app.use('/api', generalLimiter);
-
-// Body parsing
+// 1. GLOBAL MIDDLEWARE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Request logging with correlation ID
-const { requestLogger, recordMetrics } = require('./middleware/logger');
 app.use(requestLogger);
 app.use(recordMetrics);
 
-// API routes with versioning
-app.use('/api/v1', apiRouter);
+// 2. DYNAMIC CORS (Allows local dev + env overrides)
+const allowedOrigins = process.env.CORS_ORIGINS 
+  ? process.env.CORS_ORIGINS.split(',') 
+  : ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:3000'];
 
-// Health check endpoints (no auth)
-app.get('/healthz', async (req, res) => {
-  try {
-    await sequelize.authenticate();
-    res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
-  } catch (err) {
-    res.status(503).json({ status: 'unhealthy', error: err.message });
-  }
-});
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
+// 3. PUBLIC DIAGNOSTIC ROUTES (Above Rate Limiter)
+app.get('/healthz', (req, res) => res.status(200).json({ status: 'UP' }));
 
 app.get('/readyz', async (req, res) => {
   try {
     await sequelize.authenticate();
-    res.status(200).json({ status: 'ready', checks: { database: 'connected' } });
+    res.status(200).json({ status: 'READY', db: 'CONNECTED' });
   } catch (err) {
-    res.status(503).json({ status: 'not ready', checks: { database: 'disconnected' } });
+    res.status(503).json({ status: 'NOT_READY', db: 'DISCONNECTED' });
   }
 });
 
-// Root endpoint
+app.get('/metrics', (req, res) => res.json(getMetrics()));
+
+// 4. API ROUTES (With Rate Limiting)
+app.use('/api/v1', generalLimiter, apiRouter);
+
+// Test/Utility Routes
+app.post('/test-register', (req, res) => {
+  res.json({ message: 'Test works!', data: req.body });
+});
+
 app.get('/', (req, res) => {
-  res.json({
-    service: 'Service Manager API',
-    version: '1.0.0',
-    status: 'running',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ service: 'Service Manager API', status: 'running' });
 });
 
-
-// Metrics endpoint (must be before error handler)
-const { getMetrics } = require('./services/metrics');
-app.get('/metrics', (req, res) => {
-  res.json(getMetrics());
-});
-
-// Error handling (must be last)
-const errorHandler = require('./middleware/errorHandler');
+// 5. ERROR HANDLING (Must be last)
 app.use(errorHandler);
 
 module.exports = { app, sequelize };

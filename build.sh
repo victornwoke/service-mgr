@@ -20,7 +20,7 @@ docker build -t ${FRONTEND_IMAGE}:${TAG} .
 echo "Frontend built: ${FRONTEND_IMAGE}:${TAG}"
 
 # Build backend
-echo "🔧 Building backend..."
+echo "Building backend..."
 cd ../backend-node
 docker build -t ${BACKEND_IMAGE}:${TAG} .
 echo "Backend built: ${BACKEND_IMAGE}:${TAG}"
