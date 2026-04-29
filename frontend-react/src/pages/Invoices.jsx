@@ -19,7 +19,7 @@ import {
   Divider,
   Snackbar
 } from '@mui/material';
-import { ArrowBack as BackIcon, Receipt as ReceiptIcon } from '@mui/icons-material';
+import { ArrowBack as BackIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
@@ -77,7 +77,6 @@ export default function Invoices() {
         <Typography variant="h4">Invoice Management</Typography>
         <Button
           variant="contained"
-          startIcon={<ReceiptIcon />}
           onClick={() => navigate('/invoices/new')}
           fullWidth={{ xs: true, sm: false }}
         >
