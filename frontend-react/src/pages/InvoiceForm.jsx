@@ -48,7 +48,8 @@ export default function InvoiceForm() {
       try {
         // Fetch jobs that can be invoiced (Completed status)
         const jobsRes = await api.get('/jobs');
-        const invoiceableJobs = jobsRes.data.filter(job => job.status === 'Completed' && !job.Invoice);
+        const allJobs = jobsRes.data.jobs || jobsRes.data || [];
+        const invoiceableJobs = allJobs.filter(job => job.status === 'Completed' && !job.Invoice);
         setJobs(invoiceableJobs);
 
         // If we have an initial jobId, pre-fill the form

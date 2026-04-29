@@ -18,15 +18,26 @@ import {
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  FilterList as FilterIcon
+  FilterList as FilterIcon,
+  Today as TodayIcon,
+  NavigateBefore as NavigateBeforeIcon,
+  NavigateNext as NavigateNextIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 export default function Schedule() {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [weekStart, setWeekStart] = useState(new Date());
+  const [weekStart, setWeekStart] = useState(() => {
+    const today = new Date();
+    // Start from the Monday of the current week
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - today.getDay() + 1);
+    return monday;
+  });
   const [filters, setFilters] = useState({ staffId: '', status: '' });
 
   useEffect(() => {
@@ -68,7 +79,12 @@ export default function Schedule() {
     setWeekStart(d);
   };
 
-  const goToToday = () => setWeekStart(new Date());
+  const goToToday = () => {
+    const today = new Date();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - today.getDay() + 1);
+    setWeekStart(monday);
+  };
 
   const getWeekDays = () => {
     const days = [];
@@ -84,6 +100,22 @@ export default function Schedule() {
 
   const formatDay = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
+  const goToPrevMonth = () => {
+    setWeekStart(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() - 1);
+      return newDate;
+    });
+  };
+
+  const goToNextMonth = () => {
+    setWeekStart(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + 1);
+      return newDate;
+    });
+  };
+
   const getJobsForDay = (date) => {
     const dayStart = new Date(date); dayStart.setHours(0,0,0,0);
     const dayEnd = new Date(date); dayEnd.setHours(23,59,59,999);
@@ -96,25 +128,55 @@ export default function Schedule() {
   return (
     <Container maxWidth="xl">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Schedule</Typography>
+        <Box>
+          <Typography variant="h4">Schedule</Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            {weekStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </Typography>
+        </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="outlined" onClick={goToToday}>Today</Button>
-          <IconButton onClick={goToPrevWeek}><ChevronLeftIcon /></IconButton>
-          <IconButton onClick={goToNextWeek}><ChevronRightIcon /></IconButton>
+          <Button variant="outlined" startIcon={<TodayIcon />} onClick={goToToday}>Today</Button>
+          <IconButton onClick={goToPrevMonth} size="small"><NavigateBeforeIcon /></IconButton>
+          <Typography variant="button" sx={{ px: 2, py: 1 }}>
+            Week of {weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </Typography>
+          <IconButton onClick={goToNextMonth} size="small"><NavigateNextIcon /></IconButton>
+          <IconButton onClick={goToPrevWeek} color="primary"><ChevronLeftIcon /></IconButton>
+          <IconButton onClick={goToNextWeek} color="primary"><ChevronRightIcon /></IconButton>
         </Box>
       </Box>
 
       {/* Week header */}
       <Grid container spacing={1} sx={{ mb: 2 }}>
-        {getWeekDays().map(day => (
-          <Grid item xs={12} sm={6} md={12} key={day.toISOString()}>
-            <Paper sx={{ p: 2, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
-              <Typography variant="subtitle1" fontWeight={600}>
-                {formatDay(day)} {day.toLocaleDateString('en-US', { weekday: 'long' })}
-              </Typography>
-            </Paper>
-          </Grid>
-        ))}
+        {getWeekDays().map(day => {
+          const isToday = new Date().toDateString() === day.toDateString();
+          const isSelected = weekStart.toDateString() === day.toDateString();
+          return (
+            <Grid item xs={12} sm={6} md={12} key={day.toISOString()}>
+              <Paper
+                sx={{
+                  p: 2,
+                  bgcolor: isSelected ? 'primary.main' : isToday ? 'primary.light' : 'primary.light',
+                  color: 'primary.contrastText',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: isSelected ? 'primary.dark' : 'primary.main',
+                    transform: 'translateY(-2px)',
+                    boxShadow: 2
+                  }
+                }}
+                onClick={() => setWeekStart(new Date(day))}
+              >
+                <Typography variant="subtitle1" fontWeight={600}>
+                  {formatDay(day)} {day.toLocaleDateString('en-US', { weekday: 'long' })}
+                  {isToday && ' (Today)'}
+                  {isSelected && ' ←'}
+                </Typography>
+              </Paper>
+            </Grid>
+          );
+        })}
       </Grid>
 
       {/* Filters */}
@@ -157,7 +219,7 @@ export default function Schedule() {
                         borderColor: job.status === 'Completed' ? 'success.main' : job.status === 'In Progress' ? 'primary.main' : 'warning.main',
                         cursor: 'pointer'
                       }}
-                      onClick={() => window.location.href = `/jobs/${job.id}`}
+                      onClick={() => navigate(`/jobs/${job.id}`)}
                     >
                       <Typography variant="body2" fontWeight={500} noWrap>{job.service}</Typography>
                       <Typography variant="caption" color="text.secondary">{new Date(job.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Typography>

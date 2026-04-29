@@ -92,9 +92,9 @@ export default function Invoices() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  invoices.map(inv => (
-                    <TableRow key={inv.id} hover sx={{ cursor: 'pointer' }} onClick={() => {}}>
-                      <TableCell>#{inv.id}</TableCell>
+                   invoices.map(inv => (
+                     <TableRow key={inv.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/invoices/${inv.id}`)}>
+                       <TableCell>#{inv.id}</TableCell>
                       <TableCell>
                         <Typography variant="body2">Job #{inv.Job?.id || inv.jobId}</Typography>
                         <Typography variant="caption" color="text.secondary">{inv.Job?.service || 'N/A'}</Typography>

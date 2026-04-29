@@ -139,7 +139,7 @@ export default function JobDetail() {
               {/* Status-based actions */}
               {job.status === 'Pending' && (
                 <Button variant="contained" color="secondary" startIcon={<MoneyIcon />} onClick={() => handleStatusChange('Quote')}>
-                  Send Quote
+                  Create Quote
                 </Button>
               )}
               {job.status === 'Quote' && (
