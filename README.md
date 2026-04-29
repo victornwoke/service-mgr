@@ -2,7 +2,7 @@
 
 A production-ready, full‑stack SaaS platform for service‑based businesses (tradespeople, repair technicians, cleaners, etc.) built with modern cloud‑native architecture.
 
-## 🌟 Overview
+## Overview
 
 SBMS replaces paper workflows and spreadsheets with a digital system for:
 
@@ -15,7 +15,7 @@ SBMS replaces paper workflows and spreadsheets with a digital system for:
 - **Audit trail** – who changed what, when
 - **Role‑based access control** – Owner, Admin, Manager, Staff
 
-## 🏗 Architecture
+## Architecture
 
 ```txt
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
@@ -39,7 +39,7 @@ SBMS replaces paper workflows and spreadsheets with a digital system for:
 - **Observability**: Structured logging (pino), Prometheus metrics, request tracing
 - **Infrastructure**: Docker, Kubernetes, Helm-ready
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Local Development
 
@@ -71,7 +71,7 @@ SBMS replaces paper workflows and spreadsheets with a digital system for:
 2. Create an **Admin** account
 3. Log in and start adding customers, jobs, staff
 
-## 📦 Features
+## Features
 
 ### Customer Management
 
@@ -138,7 +138,7 @@ SBMS replaces paper workflows and spreadsheets with a digital system for:
 - Prometheus `/metrics` endpoint
 - Health (`/healthz`) & readiness (`/readyz`) probes
 
-## 🐳 Docker Images
+## Docker Images
 
 All services are containerized:
 
@@ -154,7 +154,7 @@ All services are containerized:
  docker run -d sbms-worker
 ```
 
-## ☸️ Kubernetes Deployment
+## Kubernetes Deployment
 
 See `k8s/` directory for manifests.
 
@@ -176,7 +176,7 @@ See `k8s/` directory for manifests.
 
 A Helm chart is planned for easy multi‑environment deployments.
 
-## 🔐 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -209,7 +209,7 @@ SMTP_PASS=pass
 NOTIFY_EMAIL=alerts@example.com
 ```
 
-## 📊 Monitoring
+## Monitoring
 
 ### Prometheus Metrics
 
@@ -224,7 +224,7 @@ Exposed at `/metrics`:
 
 Import the dashboard JSON from `monitoring/grafana-dashboard.json`.
 
-## 🔄 CI/CD
+## CI/CD
 
 ### GitHub Actions
 
@@ -263,7 +263,7 @@ jobs:
 
 An `Application` manifest is provided in `gitops/` for ArgoCD.
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Backend tests
@@ -275,7 +275,7 @@ An `Application` manifest is provided in `gitops/` for ArgoCD.
  npm run test
 ```
 
-## 📚 API Documentation
+## API Documentation
 
 Interactive Swagger UI available at `/api-docs` (future).
 
@@ -343,7 +343,7 @@ Current endpoints:
 
 - `GET /api/v1/audit` – Audit log (Admin)
 
-## 🛡️ Security Best Practices
+## Security Best Practices
 
 1. **Secrets Management**: Use Kubernetes Secrets or external vault (e.g., HashiCorp Vault)
 2. **Network Policies**: Restrict pod-to-pod communication
@@ -353,7 +353,7 @@ Current endpoints:
 6. **Updates**: Regular dependency updates (Dependabot)
 7. **Scanning**: Container image scanning (Trivy)
 
-## 📈 Roadmap
+## Roadmap
 
 - [ ] Mobile app (React Native)
 - [ ] Customer portal (self‑service booking)
@@ -363,14 +363,10 @@ Current endpoints:
 - [ ] Multi‑tenant support
 - [ ] Advanced analytics dashboard
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repo
 2. Create a feature branch
 3. Commit your changes
 4. Push to the branch
 5. Open a Pull Request
-
-## 📄 License
-
-MIT © 2026 Service Manager Team
