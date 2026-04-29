@@ -187,7 +187,7 @@ export default function Layout() {
         }}
       >
         <Toolbar />
-        <Container maxWidth="xl">
+        <Container maxWidth={false} sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
           {getBreadcrumbs()}
           <Outlet />
         </Container>

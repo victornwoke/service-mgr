@@ -13,7 +13,13 @@ import {
   MenuItem,
   CircularProgress,
   Alert,
-  Button
+  Button,
+  Card,
+  CardContent,
+  Avatar,
+  Divider,
+  Badge,
+  Tooltip
 } from '@mui/material';
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -21,7 +27,11 @@ import {
   FilterList as FilterIcon,
   Today as TodayIcon,
   NavigateBefore as NavigateBeforeIcon,
-  NavigateNext as NavigateNextIcon
+  NavigateNext as NavigateNextIcon,
+  Person as PersonIcon,
+  Schedule as ScheduleIcon,
+  LocationOn as LocationIcon,
+  Business as BusinessIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
@@ -126,113 +136,314 @@ export default function Schedule() {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4">Schedule</Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            {weekStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-          </Typography>
+    <Container maxWidth={false} sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+      {/* Header Section */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box>
+            <Typography variant="h4" fontWeight={600} gutterBottom>
+              Schedule Overview
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              {weekStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Button
+              variant="contained"
+              startIcon={<TodayIcon />}
+              onClick={goToToday}
+              sx={{ mr: 2 }}
+            >
+              Today
+            </Button>
+
+            {/* Month Navigation */}
+            <Tooltip title="Previous Month">
+              <IconButton onClick={goToPrevMonth} size="large">
+                <NavigateBeforeIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Typography variant="h6" sx={{ px: 3, fontWeight: 500 }}>
+              {weekStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            </Typography>
+
+            <Tooltip title="Next Month">
+              <IconButton onClick={goToNextMonth} size="large">
+                <NavigateNextIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+
+            {/* Week Navigation */}
+            <Tooltip title="Previous Week">
+              <IconButton onClick={goToPrevWeek} color="primary" size="large">
+                <ChevronLeftIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Typography variant="body1" sx={{ px: 2, minWidth: 120, textAlign: 'center' }}>
+              Week {Math.ceil((weekStart.getDate() - weekStart.getDay() + 1) / 7)}
+            </Typography>
+
+            <Tooltip title="Next Week">
+              <IconButton onClick={goToNextWeek} color="primary" size="large">
+                <ChevronRightIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="outlined" startIcon={<TodayIcon />} onClick={goToToday}>Today</Button>
-          <IconButton onClick={goToPrevMonth} size="small"><NavigateBeforeIcon /></IconButton>
-          <Typography variant="button" sx={{ px: 2, py: 1 }}>
-            Week of {weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </Typography>
-          <IconButton onClick={goToNextMonth} size="small"><NavigateNextIcon /></IconButton>
-          <IconButton onClick={goToPrevWeek} color="primary"><ChevronLeftIcon /></IconButton>
-          <IconButton onClick={goToNextWeek} color="primary"><ChevronRightIcon /></IconButton>
-        </Box>
+
+        {/* Filters */}
+        <Card sx={{ bgcolor: 'grey.50' }}>
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <FilterIcon color="action" />
+                <Typography variant="subtitle2">Filters:</Typography>
+              </Box>
+
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <InputLabel>Staff Member</InputLabel>
+                <Select
+                  value={filters.staffId}
+                  label="Staff Member"
+                  onChange={e => setFilters({...filters, staffId: e.target.value})}
+                >
+                  <MenuItem value="">All Staff</MenuItem>
+                  {/* Staff options would be populated from API */}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <InputLabel>Job Status</InputLabel>
+                <Select
+                  value={filters.status}
+                  label="Job Status"
+                  onChange={e => setFilters({...filters, status: e.target.value})}
+                >
+                  <MenuItem value="">All Status</MenuItem>
+                  <MenuItem value="Pending">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' }} />
+                      Pending
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="Booked">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'info.main' }} />
+                      Booked
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="In Progress">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main' }} />
+                      In Progress
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="Completed">
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                      Completed
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
 
-      {/* Week header */}
-      <Grid container spacing={1} sx={{ mb: 2 }}>
-        {getWeekDays().map(day => {
-          const isToday = new Date().toDateString() === day.toDateString();
-          const isSelected = weekStart.toDateString() === day.toDateString();
-          return (
-            <Grid item xs={12} sm={6} md={12} key={day.toISOString()}>
-              <Paper
-                sx={{
-                  p: 2,
-                  bgcolor: isSelected ? 'primary.main' : isToday ? 'primary.light' : 'primary.light',
-                  color: 'primary.contrastText',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    bgcolor: isSelected ? 'primary.dark' : 'primary.main',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 2
-                  }
-                }}
-                onClick={() => setWeekStart(new Date(day))}
-              >
-                <Typography variant="subtitle1" fontWeight={600}>
-                  {formatDay(day)} {day.toLocaleDateString('en-US', { weekday: 'long' })}
-                  {isToday && ' (Today)'}
-                  {isSelected && ' ←'}
-                </Typography>
-              </Paper>
-            </Grid>
-          );
-        })}
-      </Grid>
-
-      {/* Filters */}
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-          <FilterIcon color="action" />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Staff</InputLabel>
-            <Select value={filters.staffId} label="Staff" onChange={e => setFilters({...filters, staffId: e.target.value})}>
-              <MenuItem value="">All</MenuItem>
-              {/* staff options would be populated separately */}
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Status</InputLabel>
-            <Select value={filters.status} label="Status" onChange={e => setFilters({...filters, status: e.target.value})}>
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="In Progress">In Progress</MenuItem>
-              <MenuItem value="Completed">Completed</MenuItem>
-            </Select>
-          </FormControl>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress size={60} />
         </Box>
-      </Paper>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+      ) : (
+        <>
+          {/* Week Days Header */}
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            {getWeekDays().map(day => {
+              const isToday = new Date().toDateString() === day.toDateString();
+              const isSelectedWeek = weekStart.toDateString() === day.toDateString();
+              const dayJobs = getJobsForDay(day);
 
-      {loading ? <CircularProgress /> : error ? <Alert severity="error">{error}</Alert> : (
-        <Grid container spacing={1}>
-          {getWeekDays().map(day => {
-            const dayJobs = getJobsForDay(day);
-            return (
-              <Grid item xs={12} md={4} lg={2} key={day.toISOString()}>
-                <Paper sx={{ p: 1, minHeight: 400, bgcolor: 'grey.50' }}>
-                  {dayJobs.map(job => (
-                    <Paper
-                      key={job.id}
-                      sx={{
-                        p: 1,
-                        mb: 1,
-                        borderLeft: 4,
-                        borderColor: job.status === 'Completed' ? 'success.main' : job.status === 'In Progress' ? 'primary.main' : 'warning.main',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => navigate(`/jobs/${job.id}`)}
-                    >
-                      <Typography variant="body2" fontWeight={500} noWrap>{job.service}</Typography>
-                      <Typography variant="caption" color="text.secondary">{new Date(job.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Typography>
-                      <Box sx={{ mt: 0.5 }}>
-                        <Chip label={job.Staff?.name || 'Unassigned'} size="small" variant="outlined" sx={{ fontSize: 10, height: 20 }} />
-                      </Box>
-                    </Paper>
-                  ))}
-                </Paper>
-              </Grid>
-            );
-          })}
-        </Grid>
+              return (
+                <Grid item xs={12} sm={6} md={4} lg={2} key={day.toISOString()}>
+                  <Card
+                    sx={{
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      border: isSelectedWeek ? 2 : 1,
+                      borderColor: isSelectedWeek ? 'primary.main' : 'divider',
+                      bgcolor: isToday ? 'primary.light' : 'background.paper',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4,
+                        borderColor: 'primary.main'
+                      }
+                    }}
+                    onClick={() => setWeekStart(new Date(day))}
+                  >
+                    <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography
+                        variant="h6"
+                        fontWeight={600}
+                        color={isToday ? 'primary.contrastText' : 'text.primary'}
+                      >
+                        {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        color={isToday ? 'primary.contrastText' : 'text.primary'}
+                      >
+                        {day.getDate()}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color={isToday ? 'primary.contrastText' : 'text.secondary'}
+                      >
+                        {day.toLocaleDateString('en-US', { month: 'short' })}
+                      </Typography>
+                      {isToday && (
+                        <Chip
+                          label="Today"
+                          size="small"
+                          sx={{
+                            mt: 1,
+                            bgcolor: 'primary.contrastText',
+                            color: 'primary.main',
+                            fontWeight: 600
+                          }}
+                        />
+                      )}
+                      {dayJobs.length > 0 && (
+                        <Badge
+                          badgeContent={dayJobs.length}
+                          color="secondary"
+                          sx={{ mt: 1, '& .MuiBadge-badge': { fontSize: 12, height: 20, minWidth: 20 } }}
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+
+          {/* Schedule Grid */}
+          <Grid container spacing={3}>
+            {getWeekDays().map(day => {
+              const dayJobs = getJobsForDay(day);
+              const isToday = new Date().toDateString() === day.toDateString();
+
+              return (
+                <Grid item xs={12} sm={6} md={4} lg={2} key={day.toISOString()}>
+                  <Card
+                    sx={{
+                      minHeight: 500,
+                      bgcolor: isToday ? 'primary.50' : 'background.paper',
+                      border: isToday ? 1 : 0,
+                      borderColor: 'primary.main'
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{
+                          fontWeight: 600,
+                          color: isToday ? 'primary.main' : 'text.primary',
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                          pb: 1
+                        }}
+                      >
+                        {day.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                        {isToday && ' (Today)'}
+                      </Typography>
+
+                      {dayJobs.length === 0 ? (
+                        <Box sx={{ py: 4, textAlign: 'center' }}>
+                          <ScheduleIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                          <Typography variant="body2" color="text.secondary">
+                            No jobs scheduled
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          {dayJobs.map(job => (
+                            <Card
+                              key={job.id}
+                              sx={{
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                borderLeft: 4,
+                                borderColor: job.status === 'Completed' ? 'success.main' :
+                                           job.status === 'In Progress' ? 'primary.main' :
+                                           job.status === 'Booked' ? 'info.main' : 'warning.main',
+                                '&:hover': {
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: 3,
+                                  bgcolor: 'action.hover'
+                                }
+                              }}
+                              onClick={() => navigate(`/jobs/${job.id}`)}
+                            >
+                              <CardContent sx={{ p: 2 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                  <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1, mr: 1 }}>
+                                    {job.service}
+                                  </Typography>
+                                  <Chip
+                                    label={job.status}
+                                    size="small"
+                                    sx={{
+                                      fontSize: 10,
+                                      height: 20,
+                                      bgcolor: job.status === 'Completed' ? 'success.main' :
+                                             job.status === 'In Progress' ? 'primary.main' :
+                                             job.status === 'Booked' ? 'info.main' : 'warning.main',
+                                      color: 'white'
+                                    }}
+                                  />
+                                </Box>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                  <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {new Date(job.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                  </Typography>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                  <PersonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                  <Typography variant="caption">
+                                    {job.Staff?.name || 'Unassigned'}
+                                  </Typography>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <BusinessIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                  <Typography variant="caption" noWrap sx={{ flex: 1 }}>
+                                    {job.Customer?.name || 'Unknown Customer'}
+                                  </Typography>
+                                </Box>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </>
       )}
     </Container>
   );
