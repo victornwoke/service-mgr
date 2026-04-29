@@ -129,7 +129,7 @@ spec:
       containers:
         - name: node-api
           image: sirhumble07/sbms-api:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
           envFrom:
@@ -146,7 +146,7 @@ spec:
               cpu: "200m"
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /readyz
               port: 8081
             initialDelaySeconds: 10
             periodSeconds: 10
@@ -189,7 +189,7 @@ spec:
       containers:
         - name: python-worker
           image: sirhumble07/sbms-worker:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command: ["python", "worker.py"]
           envFrom:
             - configMapRef:
@@ -222,7 +222,7 @@ spec:
       containers:
         - name: frontend
           image: sirhumble07/sbms-frontend:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           envFrom:

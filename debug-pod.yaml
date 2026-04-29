@@ -8,6 +8,13 @@ spec:
   - name: debug
     image: sbms-api:latest
     command: ["/bin/sh", "-c", "env && sleep 300"]
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
     envFrom:
     - configMapRef:
         name: service-mgr-config

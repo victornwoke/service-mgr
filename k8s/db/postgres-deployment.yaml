@@ -21,9 +21,17 @@ spec:
           envFrom:
             - secretRef:
                 name: service-mgr-db-secret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           volumeMounts:
             - name: pgdata
               mountPath: /var/lib/postgresql/data
+              subPath: postgres
       volumes:
         - name: pgdata
           persistentVolumeClaim:
