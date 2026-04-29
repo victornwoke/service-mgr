@@ -1,72 +1,21 @@
-# Service Manager 🏢
+# Service Business Management System (SBMS)
 
-A comprehensive service management application built with modern technologies for managing jobs, customers, staff, and invoices.
+A production-ready, full‑stack SaaS platform for service‑based businesses (tradespeople, repair technicians, cleaners, etc.) built with modern cloud‑native architecture.
 
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://docker.com)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployed-326ce5)](https://kubernetes.io)
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-green)](https://nodejs.org)
-[![React](https://img.shields.io/badge/React-18.x-blue)](https://reactjs.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.x-blue)](https://postgresql.org)
+## 🌟 Overview
 
-## 📋 Table of Contents
+SBMS replaces paper workflows and spreadsheets with a digital system for:
 
-- [Features] (#-features)
-- [Architecture] (#-architecture)
-- [Technology Stack] (#-technology-stack)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Development] (#-development)
-- [Deployment](#-deployment)
-- [API Documentation](#-api-documentation)
-- [Mobile Responsiveness] (#-mobile-responsiveness)
-- [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
+- **Customer 360° view** – complete history, notes, tags
 
-## Features
+- **Job lifecycle management** – quote → booked → in progress → completed → invoiced
+- **Staff scheduling & assignment** – drag‑and‑drop calendar
+- **Automated background tasks** – reminders, follow‑ups, daily summaries
+- **Invoicing & payments** – track revenue, payment status
+- **Audit trail** – who changed what, when
+- **Role‑based access control** – Owner, Admin, Manager, Staff
 
-### Job Management
-
-- ✅ **Create & Edit Jobs**: Full CRUD operations with validation
-- ✅ **Job Timeline**: Interactive status workflow (Pending → Quote → Booked → In Progress → Completed → Invoiced)
-- ✅ **Staff Assignment**: Assign staff members to jobs
-- ✅ **Advanced Filtering**: Filter by status, staff, customer, date ranges
-- ✅ **Job Notes**: Track progress with detailed notes
-
-### Customer Management
-
-- ✅ **Customer Profiles**: Complete customer information management
-- ✅ **Job History**: View all jobs associated with customers
-- ✅ **Contact Management**: Phone, email, and address tracking
-- ✅ **Search & Filter**: Find customers quickly
-
-### Staff Management
-
-- ✅ **Staff Directory**: Manage staff members with role-based access
-- ✅ **Role Management**: Admin, Manager, Staff roles with different permissions
-- ✅ **Workload Tracking**: Monitor staff assignments and availability
-- ✅ **Performance Metrics**: Track completed jobs and efficiency
-
-### Invoice Management
-
-- ✅ **Automatic Invoice Creation**: Generate invoices from completed jobs
-- ✅ **Invoice Tracking**: Monitor paid/unpaid status
-- ✅ **PDF Generation**: Export invoices (coming soon)
-- ✅ **Email Integration**: Send invoices to customers (coming soon)
-
-### Dashboard & Analytics
-
-- ✅ **Real-time Metrics**: Today's jobs, monthly revenue, completion rates
-- ✅ **Visual Charts**: Status breakdowns and performance indicators
-- ✅ **Quick Actions**: Fast access to create jobs, customers, and invoices
-
-### Schedule Management
-
-- ✅ **Interactive Calendar**: Clickable date navigation
-- ✅ **Weekly/Monthly Views**: Navigate between different time periods
-- ✅ **Job Visualization**: See jobs scheduled for each day
-- ✅ **Today Highlighting**: Special indicators for current date
-
-## 🏗️ Architecture
+## 🏗 Architecture
 
 ``` txt
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -108,56 +57,16 @@ A comprehensive service management application built with modern technologies fo
 
 ## 🛠️ Technology Stack
 
-### Frontend
+- **Frontend**: React 18, Vite, Material‑UI (MUI), React Router v6
+- **Backend**: Node.js 20, Express, Sequelize ORM, PostgreSQL
+- **Worker**: Python 3.11 (requests, schedule)
+- **Auth**: JWT with refresh tokens, bcrypt password hashing
+- **Observability**: Structured logging (pino), Prometheus metrics, request tracing
+- **Infrastructure**: Docker, Kubernetes, Helm-ready
 
-- **React 18** - Modern React with hooks and functional components
-- **Material-UI (MUI)** - Component library with theming
-- **React Router** - Client-side routing
-- **Axios** - HTTP client for API calls
-- **Vite** - Fast build tool and dev server
+## 🚀 Quick Start
 
-### Backend
-
-- **Node.js 20** - Runtime environment
-- **Express.js** - Web framework
-- **Sequelize** - ORM for database operations
-- **JWT** - Authentication tokens
-- **Bcrypt** - Password hashing
-- **Helmet** - Security middleware
-- **CORS** - Cross-origin resource sharing
-
-### Database
-
-- **PostgreSQL 16** - Relational database
-- **Sequelize CLI** - Database migrations and seeding
-- **Persistent Storage** - Kubernetes PVC for data persistence
-
-### DevOps & Deployment
-
-- **Docker** - Containerization
-- **Kubernetes** - Container orchestration
-- **Nginx** - Reverse proxy and load balancing
-- **RBAC** - Role-based access control
-- **Health Checks** - Application monitoring
-
-### Development Tools
-
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Jest** - Testing framework
-- **Git** - Version control
-
-## 📋 Prerequisites
-
-- **Docker & Docker Compose** (for local development)
-- **Kubernetes cluster** (for production deployment)
-- **kubectl** (Kubernetes CLI)
-- **Node.js 20+** (for local frontend/backend development)
-- **Python 3.11+** (for worker development)
-
-## 🚀 Installation
-
-### Quick Start (Automated)
+### Local Development
 
 ```bash
 # Clone the repository
@@ -238,89 +147,205 @@ pip install -r requirements.txt
 python worker.py
 ```
 
-## Development
+### First Time Setup
 
-### Local Development Workflow
+1. Open [http://localhost:3000/register](http://localhost:3000/register)
+2. Create an **Admin** account
+3. Log in and start adding customers, jobs, staff
+
+## 📦 Features
+
+### Customer Management
+
+- Full CRUD with search & pagination
+- Tags: VIP, Late Payer, New
+- Service history timeline
+- Export to CSV
+
+### Job Management
+
+- Create jobs with date, time, location, service type
+- Assign staff members
+- Status workflow: Pending → Quote → Booked → In Progress → Completed → Invoiced
+- Add notes & attachments
+- Automatic reminders (configurable hours before start)
+- Follow‑up tasks after completion
+
+### Staff Management
+
+- Role‑based permissions (Owner, Admin, Manager, Staff)
+- Password hashing with bcrypt
+- Workload overview
+
+### Invoicing
+
+- Create invoices from completed jobs
+- Track payment status (Paid/Unpaid)
+- Payment records
+
+### Calendar / Schedule
+
+- Week view with drag‑and‑drop (future)
+- Filter by staff, service, status
+- Today’s jobs panel
+- Overdue jobs alert
+
+### Background Tasks
+
+- Job reminders (email/SMS ready)
+- Follow‑up emails
+- Daily summary reports
+- Retry logic with exponential backoff
+
+### Reporting & Analytics
+
+- Jobs per week
+- Revenue by service
+- Job status distribution
+- Exportable charts (future)
+
+### Security
+
+- Helmet CSP headers
+- CORS locked to frontend origin
+- Rate limiting (global + auth endpoints)
+- Input sanitization (sanitize‑html)
+- JWT authentication with short expiry
+- Audit logging on all mutations
+
+### Observability
+
+- Structured JSON logs (pino)
+- Request correlation IDs
+- Prometheus `/metrics` endpoint
+- Health (`/healthz`) & readiness (`/readyz`) probes
+
+## 🐳 Docker Images
+
+All services are containerized:
 
 ```bash
-# Terminal 1: Start database
-docker run -d --name service-mgr-postgres -p 5432:5432 postgres:16
+# Build
+ docker build -t sbms-frontend:latest ./frontend-react
+ docker build -t sbms-api:latest ./backend-node
+ docker build -t sbms-worker:latest ./worker-python
 
-# Terminal 2: Start backend
-cd backend-node && npm run dev
-
-# Terminal 3: Start frontend
-cd frontend-react && npm run dev
-
-# Terminal 4: Start worker (optional)
-cd worker-python && python worker.py
+# Run
+ docker run -d -p 3000:3000 sbms-frontend
+ docker run -d -p 8081:8081 sbms-api
+ docker run -d sbms-worker
 ```
 
-### Available Scripts
+## ☸️ Kubernetes Deployment
 
-#### Backend (`backend-node/`)
+See `k8s/` directory for manifests.
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run test         # Run tests
-npm run migrate      # Run database migrations
-npm run seed         # Seed database with sample data
-npm run lint         # Lint code
+# Deploy all
+ kubectl apply -f k8s/
+
+# Check pods
+ kubectl get pods -n service-mgr
+
+# View logs
+ kubectl logs -f deployment/service-mgr-api -n service-mgr
+
+# Update image
+ kubectl set image deployment/service-mgr-api api=sbms-api:v2 -n service-mgr
 ```
 
-#### Frontend (`frontend-react/`)
+### Helm Chart (future)
 
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run test         # Run tests
-npm run lint         # Lint code
-npm run preview      # Preview production build
+A Helm chart is planned for easy multi‑environment deployments.
+
+## 🔐 Configuration
+
+### Environment Variables
+
+**Backend (`.env`)**
+
+```env
+PORT=8081
+NODE_ENV=development
+JWT_SECRET=your-secret-key
+INTERNAL_SERVICE_TOKEN=worker-secret-token
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=sbms
+DB_USER=postgres
+DB_PASS=postgres
+
+FRONTEND_URL=http://localhost:3000
 ```
 
-#### Automation Scripts
+**Worker***
 
-```bash
-./automate.sh build         # Build all images
-./automate.sh deploy        # Deploy to Kubernetes
-./automate.sh full-deploy   # Complete deployment pipeline
-./automate.sh status        # Check cluster status
-./automate.sh logs api      # View API logs
-./setup-db.sh              # Initialize database
+```env
+API_URL=http://backend-node:8081/api/v1
+INTERNAL_SERVICE_TOKEN=worker-secret-token
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=user
+SMTP_PASS=pass
+NOTIFY_EMAIL=alerts@example.com
 ```
 
-## 🚢 Deployment
+## 📊 Monitoring
 
-### Automated Deployment
+### Prometheus Metrics
 
-```bash
-# Full production deployment
-./automate.sh full-deploy
+Exposed at `/metrics`:
 
-# Or step-by-step
-./automate.sh build
-./automate.sh deploy
+- `http_requests_total` (by path, method, status)
+- `http_request_duration_seconds` (p50, p95, p99)
+- `db_connections`
+- `background_tasks_pending`
+
+### Grafana Dashboard
+
+Import the dashboard JSON from `monitoring/grafana-dashboard.json`.
+
+## 🔄 CI/CD
+
+### GitHub Actions
+
+Example workflow (`.github/workflows/deploy.yml`):
+
+```yaml
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build & Push Frontend
+        run: |
+          docker build -t ghcr.io/your-org/sbms-frontend:${{ github.sha }} ./frontend-react
+          docker push ghcr.io/your-org/sbms-frontend:${{ github.sha }}
+      
+      - name: Build & Push Backend
+        run: |
+          docker build -t ghcr.io/your-org/sbms-api:${{ github.sha }} ./backend-node
+          docker push ghcr.io/your-org/sbms-api:${{ github.sha }}
+      
+      - name: Deploy to K8s
+        run: |
+          kubectl set image deployment/service-mgr-frontend frontend=ghcr.io/your-org/sbms-frontend:${{ github.sha }} -n service-mgr
+          kubectl set image deployment/service-mgr-api api=ghcr.io/your-org/sbms-api:${{ github.sha }} -n service-mgr
 ```
 
-### Manual Kubernetes Deployment
+### GitOps (ArgoCD)
 
-```bash
-# Apply RBAC and configurations
-kubectl apply -f k8s/rbac.yaml
-kubectl apply -f k8s/namespace.yaml
+An `Application` manifest is provided in `gitops/` for ArgoCD.
 
-# Deploy services
-kubectl apply -f k8s/service-mgr.yaml
-
-# Check deployment status
-kubectl get pods -n service-mgr
-kubectl get services -n service-mgr
-```
-
-### Environment Configuration
-
-Create secrets for sensitive data:
+## 🧪 Testing
 
 ```bash
 # Database credentials
@@ -368,255 +393,102 @@ spec:
               number: 8081
 ```
 
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-```http
-POST /api/v1/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "role": "Staff"
-}
-```
+## API Documentation
 
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
+Interactive Swagger UI available at `/api-docs` (future).
 
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
+Current endpoints:
 
-### Job Management*
+### Auth
 
-```http
-GET    /api/v1/jobs              # List jobs with pagination
-POST   /api/v1/jobs              # Create new job
-GET    /api/v1/jobs/:id          # Get job details
-PUT    /api/v1/jobs/:id          # Update job
-DELETE /api/v1/jobs/:id          # Delete job
-PATCH  /api/v1/jobs/:id/status   # Update job status
-```
+- `POST /api/v1/auth/login` – Login
+- `POST /api/v1/auth/register` – Register (Admin only)
 
-### Customer Management*
+### Customers
 
-```http
-GET    /api/v1/customers         # List customers
-POST   /api/v1/customers         # Create customer
-GET    /api/v1/customers/:id     # Get customer details
-PUT    /api/v1/customers/:id     # Update customer
-DELETE /api/v1/customers/:id     # Delete customer
-```
+- `GET /api/v1/customers` – List (paginated, searchable)
+- `POST /api/v1/customers` – Create
+- `GET /api/v1/customers/:id` – Detail (360 view)
+- `PUT /api/v1/customers/:id` – Update
+- `DELETE /api/v1/customers/:id` – Delete
 
-### Staff Management*
+### Jobs
 
-```http
-GET    /api/v1/staff             # List staff (Admin only)
-POST   /api/v1/staff             # Create staff member
-GET    /api/v1/staff/:id         # Get staff details
-PUT    /api/v1/staff/:id         # Update staff member
-DELETE /api/v1/staff/:id         # Delete staff member
-```
+- `GET /api/v1/jobs` – List (filterable)
+- `POST /api/v1/jobs` – Create
+- `GET /api/v1/jobs/:id` – Detail
+- `PATCH /api/v1/jobs/:id` – Update
+- `DELETE /api/v1/jobs/:id` – Delete
 
-### Invoice Management*
+### Staff
 
-```http
-GET    /api/v1/invoices          # List invoices
-POST   /api/v1/invoices          # Create invoice
-GET    /api/v1/invoices/:id      # Get invoice details
-PUT    /api/v1/invoices/:id      # Update invoice
-DELETE /api/v1/invoices/:id      # Delete invoice
-```
+- `GET /api/v1/staff` – List
+- `POST /api/v1/staff` – Create (Admin)
+- `PUT /api/v1/staff/:id` – Update (Admin)
+- `DELETE /api/v1/staff/:id` – Delete (Admin)
 
-## Mobile Responsiveness
+### Invoices
 
-The application is fully responsive and optimized for mobile devices:
+- `GET /api/v1/invoices` – List
+- `POST /api/v1/invoices` – Create
+- `PATCH /api/v1/invoices/:id` – Update status
 
-### Responsive Features
+### Services
 
-**Breakpoints:**
+- `GET /api/v1/services` – List
+- `POST /api/v1/services` – Create (Admin)
+- `PUT /api/v1/services/:id` – Update (Admin)
 
-- **xs (0-600px)**: Mobile phones
-- **sm (600-900px)**: Tablets
-- **md (900-1200px)**: Small desktops
-- **lg (1200px+)**: Large desktops
+### Dashboard
 
-**Mobile Optimizations:**
+- `GET /api/v1/dashboard` – Overview stats
+- `GET /api/v1/dashboard/today` – Today’s schedule
+- `GET /api/v1/dashboard/overdue` – Overdue jobs
+- `GET /api/v1/dashboard/customers/:id` – Customer 360
 
-- ✅ **No horizontal scrolling** on any screen size
-- ✅ **Touch-friendly buttons** and interactive elements
-- ✅ **Responsive navigation** that adapts to screen size
-- ✅ **Optimized tables** with horizontal scroll when needed
-- ✅ **Mobile-first forms** with proper input sizing
+### Reporting
 
-### Testing Responsiveness
+- `GET /api/v1/reporting/jobs-per-week` – Weekly job counts
+- `GET /api/v1/reporting/revenue-by-service` – Revenue breakdown
+- `GET /api/v1/reporting/jobs-by-status` – Status distribution
 
-**Chrome DevTools:**
+### Tasks (Worker)
 
-1. Press `F12` → Click device icon (📱)
-2. Select device presets or drag viewport
-3. Test from 320px to 1920px widths
+- `GET /api/v1/tasks` – List pending tasks (Admin)
+- `PATCH /api/v1/tasks/:id` – Update status
 
-**Manual Testing:**
+### Audit
 
-```bash
-# Resize browser window and check:
-# - No horizontal scroll bars
-# - All content accessible
-# - Buttons and links clickable
-# - Text readable at all sizes
-```
+- `GET /api/v1/audit` – Audit log (Admin)
 
-## 🔧 Troubleshooting
+## 🛡️ Security Best Practices
 
-### Common Issues
+1. **Secrets Management**: Use Kubernetes Secrets or external vault (e.g., HashiCorp Vault)
+2. **Network Policies**: Restrict pod-to-pod communication
+3. **TLS**: Terminate at ingress (cert‑manager)
+4. **RBAC**: Least privilege for service accounts
+5. **Backups**: Automated PostgreSQL backups with tested restore
+6. **Updates**: Regular dependency updates (Dependabot)
+7. **Scanning**: Container image scanning (Trivy)
 
-**Port Forwarding Issues:**
+## 📈 Roadmap
 
-```bash
-# Restart port forwarding
-pkill -f kubectl
-kubectl port-forward svc/service-mgr-frontend 8080:80 -n service-mgr &
-kubectl port-forward svc/service-mgr-node-api 8081:8081 -n service-mgr &
-```
+- [ ] Mobile app (React Native)
+- [ ] Customer portal (self‑service booking)
+- [ ] SMS/email integrations (Twilio, SendGrid)
+- [ ] Inventory management
+- [ ] QuickBooks/Xero integration
+- [ ] Multi‑tenant support
+- [ ] Advanced analytics dashboard
 
-**Database Connection Issues:**
+## Contributing
 
-```bash
-# Check database pod
-kubectl logs -n service-mgr deployment/service-mgr-postgres
+1. Fork the repo
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-# Reset database
-kubectl delete pod -n service-mgr -l app=service-mgr-postgres
-```
+## 📄 License
 
-**Pod Crash Issues:**
-
-```bash
-# Check pod status
-kubectl get pods -n service-mgr
-
-# View pod logs
-kubectl logs -n service-mgr <pod-name>
-
-# Describe pod for details
-kubectl describe pod -n service-mgr <pod-name>
-```
-
-**Build Issues:**
-
-```bash
-# Clear Docker cache
-docker system prune -a
-
-# Rebuild images
-./automate.sh build
-
-# Force redeploy
-kubectl rollout restart deployment -n service-mgr
-```
-
-### Health Checks
-
-```bash
-# API health
-curl http://localhost:8081/healthz
-
-# Database connectivity
-kubectl exec -n service-mgr deployment/service-mgr-node-api -- npm run db:check
-
-# Pod health
-kubectl get pods -n service-mgr
-kubectl top pods -n service-mgr
-```
-
-### Logs and Monitoring
-
-```bash
-# View all logs
-./automate.sh logs api
-./automate.sh logs frontend
-./automate.sh logs worker
-
-# Monitor resources
-kubectl top nodes
-kubectl top pods -n service-mgr
-
-# Check events
-kubectl get events -n service-mgr --sort-by=.metadata.creationTimestamp
-```
-
-## 🤝 Contributing
-
-### Development Setup
-
-1. **Fork the repository**
-2. **Create a feature branch:**
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-3. **Make your changes**
-4. **Run tests:**
-
-   ```bash
-   cd backend-node && npm test
-   cd ../frontend-react && npm test
-   ```
-
-5. **Commit your changes:**
-
-   ```bash
-   git commit -m "Add: Your feature description"
-   ```
-
-6. **Push to your fork**
-7. **Create a Pull Request**
-
-### Code Standards
-
-- **ESLint**: Follow the configured linting rules
-- **Prettier**: Code is automatically formatted
-- **Testing**: Write tests for new features
-- **Documentation**: Update README for new features
-
-### Commit Message Format
-
-``` txt
-type(scope): description
-
-Types:
-- feat: New features
-- fix: Bug fixes
-- docs: Documentation
-- style: Code style changes
-- refactor: Code refactoring
-- test: Testing
-- chore: Maintenance
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Material-UI** for the excellent component library
-- **Sequelize** for the robust ORM
-- **Express.js** for the web framework
-- **PostgreSQL** for the reliable database
-- **Kubernetes** for container orchestration
-
-## Support
-
-For support and questions:
-
----
+MIT © 2026 Service Manager Team
