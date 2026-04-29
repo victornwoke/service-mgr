@@ -19,7 +19,7 @@ import {
   Divider,
   Snackbar
 } from '@mui/material';
-import { ArrowBack as BackIcon } from '@mui/icons-material';
+import { ArrowBack as BackIcon, Receipt as ReceiptIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
@@ -60,13 +60,30 @@ export default function Invoices() {
   };
 
   return (
-    <Box>
+    <Box sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <MuiLink component="button" onClick={() => navigate('/dashboard')} underline="hover">Home</MuiLink>
         <Typography color="text.primary">Invoices</Typography>
       </Breadcrumbs>
 
-      <Typography variant="h4" gutterBottom>Invoices</Typography>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'flex-start', sm: 'center' },
+        gap: 2,
+        mb: 3
+      }}>
+        <Typography variant="h4">Invoice Management</Typography>
+        <Button
+          variant="contained"
+          startIcon={<ReceiptIcon />}
+          onClick={() => navigate('/invoices/new')}
+          fullWidth={{ xs: true, sm: false }}
+        >
+          Create Invoice
+        </Button>
+      </Box>
       <Divider sx={{ mb: 3 }} />
 
       {loading ? <CircularProgress /> : error ? <Alert severity="error">{error}</Alert> : (

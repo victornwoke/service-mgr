@@ -7,7 +7,7 @@ const { authenticate, authorize } = require('../middleware/auth');
 router.use('/auth', require('./auth'));
 router.use('/customers', authenticate, require('./customers'));
 router.use('/jobs', authenticate, require('./jobs'));
-router.use('/staff', authenticate, authorize('Admin'), require('./staff'));
+router.use('/staff', authenticate, require('./staff'));
 router.use('/invoices', authenticate, require('./invoices'));
 router.use('/dashboard', authenticate, require('./dashboard'));
 

@@ -83,11 +83,23 @@ export default function Jobs() {
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Jobs</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/jobs/new')}>
-          New Job
+    <Box sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', sm: 'center' },
+        gap: 2,
+        mb: 3
+      }}>
+        <Typography variant="h4">Job Management</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/jobs/new')}
+          fullWidth={{ xs: true, sm: false }}
+        >
+          Create New Job
         </Button>
       </Box>
 

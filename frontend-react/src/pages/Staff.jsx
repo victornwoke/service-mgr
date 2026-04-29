@@ -123,11 +123,23 @@ export default function Staff() {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Staff</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpen()}>
-          Add Staff
+    <Container maxWidth={false} sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', sm: 'center' },
+        gap: 2,
+        mb: 3
+      }}>
+        <Typography variant="h4">Staff Management</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpen()}
+          fullWidth={{ xs: true, sm: false }}
+        >
+          Add Staff Member
         </Button>
       </Box>
 

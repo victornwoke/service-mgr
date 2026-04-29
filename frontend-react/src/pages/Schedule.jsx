@@ -264,84 +264,91 @@ export default function Schedule() {
       ) : (
         <>
           {/* Week Days Header */}
-          <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
             {getWeekDays().map(day => {
               const isToday = new Date().toDateString() === day.toDateString();
               const isSelectedWeek = weekStart.toDateString() === day.toDateString();
               const dayJobs = getJobsForDay(day);
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={2} key={day.toISOString()}>
-                  <Card
-                    sx={{
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      border: isSelectedWeek ? 2 : 1,
-                      borderColor: isSelectedWeek ? 'primary.main' : 'divider',
-                      bgcolor: isToday ? 'primary.light' : 'background.paper',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: 4,
-                        borderColor: 'primary.main'
-                      }
-                    }}
-                    onClick={() => setWeekStart(new Date(day))}
-                  >
-                    <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                      <Typography
-                        variant="h6"
-                        fontWeight={600}
-                        color={isToday ? 'primary.contrastText' : 'text.primary'}
-                      >
-                        {day.toLocaleDateString('en-US', { weekday: 'short' })}
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        color={isToday ? 'primary.contrastText' : 'text.primary'}
-                      >
-                        {day.getDate()}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color={isToday ? 'primary.contrastText' : 'text.secondary'}
-                      >
-                        {day.toLocaleDateString('en-US', { month: 'short' })}
-                      </Typography>
-                      {isToday && (
-                        <Chip
-                          label="Today"
-                          size="small"
-                          sx={{
-                            mt: 1,
-                            bgcolor: 'primary.contrastText',
-                            color: 'primary.main',
-                            fontWeight: 600
-                          }}
-                        />
-                      )}
-                      {dayJobs.length > 0 && (
-                        <Badge
-                          badgeContent={dayJobs.length}
-                          color="secondary"
-                          sx={{ mt: 1, '& .MuiBadge-badge': { fontSize: 12, height: 20, minWidth: 20 } }}
-                        />
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card
+                  key={day.toISOString()}
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    border: isSelectedWeek ? 2 : 1,
+                    borderColor: isSelectedWeek ? 'primary.main' : 'divider',
+                    bgcolor: isToday ? 'primary.light' : 'background.paper',
+                    minWidth: { xs: '100%', sm: '45%', md: '30%', lg: '13%' },
+                    flex: { lg: '1 1 0%' },
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4,
+                      borderColor: 'primary.main'
+                    }
+                  }}
+                  onClick={() => setWeekStart(new Date(day))}
+                >
+                  <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                    <Typography
+                      variant="h6"
+                      fontWeight={600}
+                      color={isToday ? 'primary.contrastText' : 'text.primary'}
+                    >
+                      {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                    </Typography>
+                    <Typography
+                      variant="h4"
+                      fontWeight={700}
+                      color={isToday ? 'primary.contrastText' : 'text.primary'}
+                    >
+                      {day.getDate()}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color={isToday ? 'primary.contrastText' : 'text.secondary'}
+                    >
+                      {day.toLocaleDateString('en-US', { month: 'short' })}
+                    </Typography>
+                    {isToday && (
+                      <Chip
+                        label="Today"
+                        size="small"
+                        sx={{
+                          mt: 1,
+                          bgcolor: 'primary.contrastText',
+                          color: 'primary.main',
+                          fontWeight: 600
+                        }}
+                      />
+                    )}
+                    {dayJobs.length > 0 && (
+                      <Badge
+                        badgeContent={dayJobs.length}
+                        color="secondary"
+                        sx={{ mt: 1, '& .MuiBadge-badge': { fontSize: 12, height: 20, minWidth: 20 } }}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
               );
             })}
-          </Grid>
+          </Box>
 
           {/* Schedule Grid */}
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
             {getWeekDays().map(day => {
               const dayJobs = getJobsForDay(day);
               const isToday = new Date().toDateString() === day.toDateString();
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={2} key={day.toISOString()}>
+                <Box
+                  key={day.toISOString()}
+                  sx={{
+                    flex: { xs: '1 1 100%', sm: '1 1 45%', md: '1 1 30%', lg: '1 1 13%' },
+                    minWidth: { xs: '100%', sm: '45%', md: '30%', lg: '13%' }
+                  }}
+                >
                   <Card
                     sx={{
                       minHeight: 500,
@@ -439,10 +446,10 @@ export default function Schedule() {
                       )}
                     </CardContent>
                   </Card>
-                </Grid>
+                </Box>
               );
             })}
-          </Grid>
+          </Box>
         </>
       )}
     </Container>
