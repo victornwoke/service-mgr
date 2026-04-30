@@ -10,5 +10,6 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.js', '**/*.test.js'],
   verbose: true,
   forceExit: true,
-  detachOpenHandles: true
+  detectOpenHandles: true,
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js']
 };

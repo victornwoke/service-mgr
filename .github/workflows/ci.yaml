@@ -158,9 +158,24 @@ jobs:
         run: cd backend-node && npm ci
 
       - name: Run backend tests
-        run: cd backend-node && npm test
+        run: |
+          cd backend-node
+          # Wait for database to be ready and create test database if needed
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+          # Create test database if it doesn't exist
+          PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -c "CREATE DATABASE test;" || echo "Database test already exists"
+          npm test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: test
+          DB_USER: postgres
+          DB_PASS: postgres
+          NODE_ENV: test
+          JWT_SECRET: test-jwt-secret-for-testing-only
 
       - name: Setup Node.js for frontend
         uses: actions/setup-node@v4
