@@ -20,7 +20,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  GITOPS_REPO: ${{ github.repository }}-gitops
+  GITOPS_REPO: sirhumble07/service-mgr-gitops
 
 jobs:
   build-and-test:
