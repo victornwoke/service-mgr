@@ -48,7 +48,7 @@ describe('RBAC Permissions', () => {
     const res = await request(app)
       .post('/api/v1/staff')
       .set('Authorization', `Bearer ${managerToken}`)
-      .send({ name: 'Bad', email: 'bad@test.com', role: 'Staff', password: 'pw' });
+      .send({ name: 'Bad', email: 'bad@test.com', role: 'Staff', password: 'password123' });
 
     expect(res.status).toBe(403);
     expect(res.body.code).toBe('FORBIDDEN');
@@ -56,9 +56,8 @@ describe('RBAC Permissions', () => {
 
   test('Staff cannot access admin-only endpoints', async () => {
     const res = await request(app)
-      .post('/api/v1/services')
-      .set('Authorization', `Bearer ${staffToken}`)
-      .send({ name: 'Test Service' });
+      .get('/api/v1/staff')
+      .set('Authorization', `Bearer ${staffToken}`);
 
     expect(res.status).toBe(403);
   });

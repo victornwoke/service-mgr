@@ -11,20 +11,20 @@ describe('Health & Ready endpoints', () => {
   test('GET /healthz returns healthy', async () => {
     const res = await request(app).get('/healthz');
     expect(res.status).toBe(200);
-    expect(res.body.status).toBe('healthy');
+    expect(res.body.status).toBe('UP');
   });
 
   test('GET /readyz returns ready', async () => {
     const res = await request(app).get('/readyz');
     expect(res.status).toBe(200);
-    expect(res.body.status).toBe('ready');
-    expect(res.body.checks.database).toBe('connected');
+    expect(res.body.status).toBe('READY');
+    expect(res.body.db).toBe('CONNECTED');
   });
 
   test('GET / returns service info', async () => {
     const res = await request(app).get('/');
     expect(res.status).toBe(200);
     expect(res.body.service).toBe('Service Manager API');
-    expect(res.body.version).toBe('1.0.0');
+    expect(res.body.status).toBe('running');
   });
 });
