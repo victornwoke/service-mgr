@@ -259,32 +259,30 @@ jobs:
           rm -f environments/staging/values.yaml
 
           # Update staging values with clean replacement
-          cat > environments/staging/values.yaml << EOF
-global:
-  environment: staging
-  commitSha: "${FULL_SHA}"
-
-frontend:
-  image:
-    tag: "${BRANCH_NAME}-sha-${FULL_SHA}"
-
-api:
-  image:
-    tag: "${BRANCH_NAME}-sha-${FULL_SHA}"
-
-worker:
-  image:
-    tag: "${BRANCH_NAME}-sha-${FULL_SHA}"
-
-ingress:
-  hosts:
-    - host: staging.service-mgr.local
-      paths:
-        - path: /
-          pathType: Prefix
-        - path: /api
-          pathType: Prefix
-EOF
+          echo 'global:' > environments/staging/values.yaml
+          echo '  environment: staging' >> environments/staging/values.yaml
+          echo '  commitSha: "'"${FULL_SHA}"'"' >> environments/staging/values.yaml
+          echo '' >> environments/staging/values.yaml
+          echo 'frontend:' >> environments/staging/values.yaml
+          echo '  image:' >> environments/staging/values.yaml
+          echo '    tag: "'"${BRANCH_NAME}"'-sha-'"${FULL_SHA}"'"' >> environments/staging/values.yaml
+          echo '' >> environments/staging/values.yaml
+          echo 'api:' >> environments/staging/values.yaml
+          echo '  image:' >> environments/staging/values.yaml
+          echo '    tag: "'"${BRANCH_NAME}"'-sha-'"${FULL_SHA}"'"' >> environments/staging/values.yaml
+          echo '' >> environments/staging/values.yaml
+          echo 'worker:' >> environments/staging/values.yaml
+          echo '  image:' >> environments/staging/values.yaml
+          echo '    tag: "'"${BRANCH_NAME}"'-sha-'"${FULL_SHA}"'"' >> environments/staging/values.yaml
+          echo '' >> environments/staging/values.yaml
+          echo 'ingress:' >> environments/staging/values.yaml
+          echo '  hosts:' >> environments/staging/values.yaml
+          echo '    - host: staging.service-mgr.local' >> environments/staging/values.yaml
+          echo '      paths:' >> environments/staging/values.yaml
+          echo '        - path: /' >> environments/staging/values.yaml
+          echo '          pathType: Prefix' >> environments/staging/values.yaml
+          echo '        - path: /api' >> environments/staging/values.yaml
+          echo '          pathType: Prefix' >> environments/staging/values.yaml
 
           # Commit and push changes
           git config --local user.email "action@github.com"
@@ -336,46 +334,44 @@ EOF
           rm -f environments/production/values.yaml
 
           # Update production values with clean replacement
-          cat > environments/production/values.yaml << EOF
-global:
-  environment: production
-  commitSha: "${FULL_SHA}"
-
-frontend:
-  image:
-    tag: "main-sha-${FULL_SHA}"
-  replicaCount: 3
-
-api:
-  image:
-    tag: "main-sha-${FULL_SHA}"
-  replicaCount: 3
-
-worker:
-  image:
-    tag: "main-sha-${FULL_SHA}"
-  replicaCount: 2
-
-postgresql:
-  auth:
-    postgresPassword: "${{ secrets.DB_POSTGRES_PASSWORD }}"
-    username: "${{ secrets.DB_USERNAME }}"
-    password: "${{ secrets.DB_PASSWORD }}"
-    database: "${{ secrets.DB_NAME }}"
-
-ingress:
-  hosts:
-    - host: service-mgr.local
-      paths:
-        - path: /
-          pathType: Prefix
-        - path: /api
-          pathType: Prefix
-  tls:
-    - secretName: service-mgr-tls
-      hosts:
-        - service-mgr.local
-EOF
+          echo 'global:' > environments/production/values.yaml
+          echo '  environment: production' >> environments/production/values.yaml
+          echo '  commitSha: "'"${FULL_SHA}"'"' >> environments/production/values.yaml
+          echo '' >> environments/production/values.yaml
+          echo 'frontend:' >> environments/production/values.yaml
+          echo '  image:' >> environments/production/values.yaml
+          echo '    tag: "main-sha-'"${FULL_SHA}"'"' >> environments/production/values.yaml
+          echo '  replicaCount: 3' >> environments/production/values.yaml
+          echo '' >> environments/production/values.yaml
+          echo 'api:' >> environments/production/values.yaml
+          echo '  image:' >> environments/production/values.yaml
+          echo '    tag: "main-sha-'"${FULL_SHA}"'"' >> environments/production/values.yaml
+          echo '  replicaCount: 3' >> environments/production/values.yaml
+          echo '' >> environments/production/values.yaml
+          echo 'worker:' >> environments/production/values.yaml
+          echo '  image:' >> environments/production/values.yaml
+          echo '    tag: "main-sha-'"${FULL_SHA}"'"' >> environments/production/values.yaml
+          echo '  replicaCount: 2' >> environments/production/values.yaml
+          echo '' >> environments/production/values.yaml
+          echo 'postgresql:' >> environments/production/values.yaml
+          echo '  auth:' >> environments/production/values.yaml
+          echo '    postgresPassword: "'"${{ secrets.DB_POSTGRES_PASSWORD }}"'"' >> environments/production/values.yaml
+          echo '    username: "'"${{ secrets.DB_USERNAME }}"'"' >> environments/production/values.yaml
+          echo '    password: "'"${{ secrets.DB_PASSWORD }}"'"' >> environments/production/values.yaml
+          echo '    database: "'"${{ secrets.DB_NAME }}"'"' >> environments/production/values.yaml
+          echo '' >> environments/production/values.yaml
+          echo 'ingress:' >> environments/production/values.yaml
+          echo '  hosts:' >> environments/production/values.yaml
+          echo '    - host: service-mgr.local' >> environments/production/values.yaml
+          echo '      paths:' >> environments/production/values.yaml
+          echo '        - path: /' >> environments/production/values.yaml
+          echo '          pathType: Prefix' >> environments/production/values.yaml
+          echo '        - path: /api' >> environments/production/values.yaml
+          echo '          pathType: Prefix' >> environments/production/values.yaml
+          echo '  tls:' >> environments/production/values.yaml
+          echo '    - secretName: service-mgr-tls' >> environments/production/values.yaml
+          echo '      hosts:' >> environments/production/values.yaml
+          echo '        - service-mgr.local' >> environments/production/values.yaml
 
           # Commit and push changes
           git config --local user.email "action@github.com"
