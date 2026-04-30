@@ -139,10 +139,7 @@ jobs:
           POSTGRES_DB: test
         ports:
           - 5432:5432
-        options: >-
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        # Removed health check to avoid Docker inspect issues
 
     steps:
       - name: Checkout repository
@@ -161,18 +158,24 @@ jobs:
       - name: Run backend tests
         run: |
           cd backend-node
-          # Simple wait for PostgreSQL to be ready
+          # Wait for PostgreSQL to be fully ready
           echo "Waiting for PostgreSQL to be ready..."
-          for i in {1..30}; do
-            if PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d test -c "SELECT 1;" >/dev/null 2>&1; then
-              echo "PostgreSQL is ready!"
+          for i in {1..60}; do
+            if PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -c "SELECT version();" >/dev/null 2>&1; then
+              echo "✅ PostgreSQL is ready and accepting connections!"
+              # Test that the test database exists or create it
+              PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -c "CREATE DATABASE test;" 2>/dev/null || echo "✅ Test database already exists"
               break
             fi
-            echo "Attempt $i: PostgreSQL not ready yet..."
+            if [ $i -eq 60 ]; then
+              echo "❌ PostgreSQL failed to start after 2 minutes"
+              exit 1
+            fi
+            echo "⏳ Attempt $i: PostgreSQL not ready yet..."
             sleep 2
           done
 
-          echo "Starting tests..."
+          echo "🚀 Starting backend tests..."
           npm test
         env:
           DB_HOST: localhost
