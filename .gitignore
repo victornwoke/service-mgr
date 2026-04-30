@@ -71,3 +71,10 @@ argocd/applications/*/secrets.yaml
 argocd/applications/*/secrets.enc.yaml
 
 docs/
+
+
+.terraform.lock.hcl
+local.auto.tfvars.example
+tfplan
+service-mgr-local-config
+service-mgr-gitops/
