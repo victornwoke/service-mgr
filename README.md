@@ -1,490 +1,419 @@
-# Service Business Management System (SBMS)
+# Service Manager - Production DevOps Stack
 
-A production-ready, full‑stack SaaS platform for service‑based businesses (tradespeople, repair technicians, cleaners, etc.) built with modern cloud‑native architecture.
+A comprehensive production-ready DevOps stack for the Service Manager application featuring Infrastructure as Code, CI/CD, GitOps, and Observability.
 
-## Overview
+## 🏗️ Architecture Overview
 
-SBMS replaces paper workflows and spreadsheets with a digital system for:
-
-- **Customer 360° view** – complete history, notes, tags
-
-- **Job lifecycle management** – quote → booked → in progress → completed → invoiced
-- **Staff scheduling & assignment** – drag‑and‑drop calendar
-- **Automated background tasks** – reminders, follow‑ups, daily summaries
-- **Invoicing & payments** – track revenue, payment status
-- **Audit trail** – who changed what, when
-- **Role‑based access control** – Owner, Admin, Manager, Staff
-
-## Architecture
-
-``` txt
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   React Frontend│    │  Node.js Backend │    │ PostgreSQL DB   │
-│   (Port 3000)   │◄──►│   (Port 8081)   │◄──►│   (Port 5432)   │
-│                 │    │                 │    │                 │
-│ • User Interface│    │ • REST API      │    │ • Jobs          │
-│ • Dashboard     │    │ • Authentication│    │ • Customers     │
-│ • Forms         │    │ • Business Logic│    │ • Staff         │
-│ • Responsive UI │    │ • File Uploads  │    │ • Invoices      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                                 │
-┌─────────────────┐                                              │
-│ Python Worker   │                                              │
-│ (Port 8082)     │◄─────────────────────────────────────────────┘
-│                 │
-│ • Background Jobs│
-│ • Email Sending │
-│ • File Processing│
-└─────────────────┘
-```
-
-### Deployment Architecture (Kubernetes)
-
-``` txt
+```txt
 ┌─────────────────────────────────────────────────────────────┐
-│                    Kubernetes Cluster                       │
+│                    Production Stack                         │
 ├─────────────────────────────────────────────────────────────┤
-│  service-mgr-frontend     service-mgr-node-api             │
-│  ├─ Pod (React)          ├─ Pod (Node.js)                  │
-│  ├─ Pod (React)          ├─ Pod (Node.js)                  │
-│  └─ LoadBalancer         └─ LoadBalancer                   │
-│                                                             │
-│  service-mgr-postgres     service-mgr-python-worker        │
-│  ├─ Pod (PostgreSQL)     ├─ Pod (Python)                   │
-│  └─ PersistentVolume     └─ Job Queue                      │
-└─────────────────────────────────────────────────────────────┘
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  Terraform  │  │ GitHub      │  │     ArgoCD          │  │
+│  │   (IaC)     │  │ Actions     │  │    (GitOps)         │  │
+│  │             │  │ (CI/CD)     │  │                     │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+│           │               │                      │           │
+│           └───────────────┼──────────────────────┘           │
+│                           │                                  │
+│  ┌─────────────────────┐  │  ┌─────────────────────────────┐ │
+│  │    AWS EKS          │◄─┼──┤   Helm Charts               │ │
+│  │  (Kubernetes)      │  │  │   (Packaging)               │ │
+│  │                     │  │  │                             │ │
+│  │ • Service Manager  │  │  │ • Frontend, API, Worker     │ │
+│  │ • PostgreSQL       │  │  │ • ConfigMaps, Secrets       │ │
+│  │ • Redis            │  │  │ • Ingress, Services         │ │
+│  │ • Monitoring       │  │  │ • RBAC, Security            │ │
+│  └─────────────────────┘  │  └─────────────────────────────┘ │
+│                           │                                  │
+│  ┌─────────────────────┐  │  ┌─────────────────────────────┐ │
+│  │   Prometheus        │◄─┼──┤   Grafana Dashboard        │ │
+│  │   Alertmanager      │  │  │   Custom Metrics           │ │
+│  │   (Monitoring)      │  │  │   Alerts & Notifications   │ │
+│  └─────────────────────┘  │  └─────────────────────────────┘ │
+└───────────────────────────┼──────────────────────────────────┘
+                            │
+                            ▼
+                   ┌─────────────────────┐
+                   │   Production App    │
+                   │ service-mgr.local   │
+                   └─────────────────────┘
 ```
 
-## 🛠️ Technology Stack
+## 🚀 Quick Deployment
 
-- **Frontend**: React 18, Vite, Material‑UI (MUI), React Router v6
-- **Backend**: Node.js 20, Express, Sequelize ORM, PostgreSQL
-- **Worker**: Python 3.11 (requests, schedule)
-- **Auth**: JWT with refresh tokens, bcrypt password hashing
-- **Observability**: Structured logging (pino), Prometheus metrics, request tracing
-- **Infrastructure**: Docker, Kubernetes, Helm-ready
+### Prerequisites
 
-## Quick Start
+- AWS CLI configured
+- kubectl installed
+- Helm installed
+- Docker registry access
 
-### Local Development
+### Development Setup
+
+- **Local Terraform**: `./deploy-local.sh deploy` (see terraform-local/README.md)
+- **CI/CD Pipeline**: See [CI/CD Pipeline Documentation](docs/CICD-PIPELINE.md)
+
+### One-Command Setup
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# 1. Clone the repository
+git clone https://github.com/victornwoke/service-mgr.git
 cd service-mgr
 
-# Make scripts executable
-chmod +x automate.sh setup-db.sh
+# 2. Deploy infrastructure
+cd terraform
+terraform init
+terraform plan
+terraform apply
 
-# Full automated deployment
-./automate.sh full-deploy
+# 3. Configure kubectl
+aws eks update-kubeconfig --name service-mgr-production
+
+# 4. Deploy monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install monitoring prometheus-community/kube-prometheus-stack -f monitoring/values.yaml
+
+# 5. Deploy application (GitOps)
+kubectl apply -f argocd/application.yaml
 ```
 
-This will:
+## Component Overview
 
-- ✅ Build all Docker images
-- ✅ Push to registry
-- ✅ Deploy to Kubernetes
-- ✅ Set up database
-- ✅ Run health checks
+### Infrastructure (Terraform)
 
-### Manual Installation
+- **AWS EKS Cluster**: Managed Kubernetes service
+- **VPC & Networking**: Private subnets, NAT gateways
+- **RDS PostgreSQL**: Managed database with monitoring
+- **ECR Repository**: Private container registry
+- **Security Groups**: Least-privilege access controls
 
-#### 1. Clone and Setup
+**Files**: `terraform/`
 
-```bash
-git clone <repository-url>
-cd service-mgr
-```
+### CI/CD (GitHub Actions)
 
-#### 2. Environment Setup
+- **Automated Builds**: Multi-stage Docker builds
+- **Security Scanning**: Trivy vulnerability scans
+- **Testing**: Backend and frontend test suites
+- **GitOps Updates**: Automatic manifest updates
+- **Image Tagging**: SHA-based versioning
 
-```bash
-# Copy environment files
-cp backend-node/.env.example backend-node/.env
-cp frontend-react/.env.example frontend-react/.env
+**Files**: `.github/workflows/ci.yaml`
 
-# Edit environment variables as needed
-```
+### Packaging (Helm)
 
-#### 3. Database Setup
+- **Modular Charts**: Separate configurations for each component
+- **Configurable Values**: Environment-specific settings
+- **Security Hardening**: Non-root users, resource limits
+- **Monitoring Integration**: ServiceMonitors and metrics
 
-```bash
-# Start PostgreSQL
-docker run -d --name service-mgr-postgres \
-  -p 5432:5432 \
-  -e POSTGRES_DB=servicemgr \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  postgres:16
-
-# Run migrations
-cd backend-node
-npm run migrate
-```
-
-#### 4. Backend Setup
-
-```bash
-cd backend-node
-npm install
-npm run dev
-```
-
-#### 5. Frontend Setup
-
-```bash
-cd ../frontend-react
-npm install
-npm run dev
-```
-
-#### 6. Worker Setup (Optional)
-
-```bash
-cd ../worker-python
-pip install -r requirements.txt
-python worker.py
-```
-
-### First Time Setup
-
-1. Open [http://localhost:3000/register](http://localhost:3000/register)
-2. Create an **Admin** account
-3. Log in and start adding customers, jobs, staff
-
-## Features
-
-### Customer Management
-
-- Full CRUD with search & pagination
-- Tags: VIP, Late Payer, New
-- Service history timeline
-- Export to CSV
-
-### Job Management
-
-- Create jobs with date, time, location, service type
-- Assign staff members
-- Status workflow: Pending → Quote → Booked → In Progress → Completed → Invoiced
-- Add notes & attachments
-- Automatic reminders (configurable hours before start)
-- Follow‑up tasks after completion
-
-### Staff Management
-
-- Role‑based permissions (Owner, Admin, Manager, Staff)
-- Password hashing with bcrypt
-- Workload overview
-
-### Invoicing
-
-- Create invoices from completed jobs
-- Track payment status (Paid/Unpaid)
-- Payment records
-
-### Calendar / Schedule
-
-- Week view with drag‑and‑drop (future)
-- Filter by staff, service, status
-- Today’s jobs panel
-- Overdue jobs alert
-
-### Background Tasks
-
-- Job reminders (email/SMS ready)
-- Follow‑up emails
-- Daily summary reports
-- Retry logic with exponential backoff
-
-### Reporting & Analytics
-
-- Jobs per week
-- Revenue by service
-- Job status distribution
-- Exportable charts (future)
-
-### Security
-
-- Helmet CSP headers
-- CORS locked to frontend origin
-- Rate limiting (global + auth endpoints)
-- Input sanitization (sanitize‑html)
-- JWT authentication with short expiry
-- Audit logging on all mutations
-
-### Observability
-
-- Structured JSON logs (pino)
-- Request correlation IDs
-- Prometheus `/metrics` endpoint
-- Health (`/healthz`) & readiness (`/readyz`) probes
-
-## Docker Images
-
-All services are containerized:
-
-```bash
-# Build
- docker build -t sbms-frontend:latest ./frontend-react
- docker build -t sbms-api:latest ./backend-node
- docker build -t sbms-worker:latest ./worker-python
-
-# Run
- docker run -d -p 3000:3000 sbms-frontend
- docker run -d -p 8081:8081 sbms-api
- docker run -d sbms-worker
-```
-
-## Kubernetes Deployment
-
-See `k8s/` directory for manifests.
-
-```bash
-# Deploy all
- kubectl apply -f k8s/
-
-# Check pods
- kubectl get pods -n service-mgr
-
-# View logs
- kubectl logs -f deployment/service-mgr-api -n service-mgr
-
-# Update image
- kubectl set image deployment/service-mgr-api api=sbms-api:v2 -n service-mgr
-```
-
-### Helm Chart (future)
-
-A Helm chart is planned for easy multi‑environment deployments.
-
-## Configuration
-
-### Environment Variables
-
-**Backend (`.env`)**
-
-```env
-PORT=8081
-NODE_ENV=development
-JWT_SECRET=your-secret-key
-INTERNAL_SERVICE_TOKEN=worker-secret-token
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=sbms
-DB_USER=postgres
-DB_PASS=postgres
-
-FRONTEND_URL=http://localhost:3000
-```
-
-**Worker***
-
-```env
-API_URL=http://backend-node:8081/api/v1
-INTERNAL_SERVICE_TOKEN=worker-secret-token
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=user
-SMTP_PASS=pass
-NOTIFY_EMAIL=alerts@example.com
-```
-
-## Monitoring
-
-### Prometheus Metrics
-
-Exposed at `/metrics`:
-
-- `http_requests_total` (by path, method, status)
-- `http_request_duration_seconds` (p50, p95, p99)
-- `db_connections`
-- `background_tasks_pending`
-
-### Grafana Dashboard
-
-Import the dashboard JSON from `monitoring/grafana-dashboard.json`.
-
-## CI/CD
-
-### GitHub Actions
-
-Example workflow (`.github/workflows/deploy.yml`):
-
-```yaml
-name: Deploy to Kubernetes
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Build & Push Frontend
-        run: |
-          docker build -t ghcr.io/your-org/sbms-frontend:${{ github.sha }} ./frontend-react
-          docker push ghcr.io/your-org/sbms-frontend:${{ github.sha }}
-      
-      - name: Build & Push Backend
-        run: |
-          docker build -t ghcr.io/your-org/sbms-api:${{ github.sha }} ./backend-node
-          docker push ghcr.io/your-org/sbms-api:${{ github.sha }}
-      
-      - name: Deploy to K8s
-        run: |
-          kubectl set image deployment/service-mgr-frontend frontend=ghcr.io/your-org/sbms-frontend:${{ github.sha }} -n service-mgr
-          kubectl set image deployment/service-mgr-api api=ghcr.io/your-org/sbms-api:${{ github.sha }} -n service-mgr
-```
+**Files**: `charts/service-mgr/`
 
 ### GitOps (ArgoCD)
 
-An `Application` manifest is provided in `gitops/` for ArgoCD.
+- **Automated Sync**: Push-to-deploy workflow
+- **Drift Detection**: Automatic reconciliation
+- **Rollback Support**: Version-controlled deployments
+- **Multi-Environment**: Production/staging separation
 
-## Testing
+**Files**: `argocd/application.yaml`
+
+### Observability (Prometheus Stack)
+
+- **Metrics Collection**: Application and infrastructure metrics
+- **Custom Dashboards**: Grafana visualizations
+- **Alerting**: Email notifications for critical issues
+- **Service Monitoring**: Health checks and performance tracking
+
+**Files**: `monitoring/values.yaml`
+
+## Detailed Setup Instructions
+
+### Phase 1: Infrastructure Setup
+
+```bash
+# Navigate to Terraform directory
+cd terraform
+
+# Initialize Terraform
+terraform init
+
+# Plan the deployment
+terraform plan -var="db_username=servicemgr" -var="db_password=your-secure-password"
+
+# Apply the infrastructure
+terraform apply -var="db_username=servicemgr" -var="db_password=your-secure-password"
+```
+
+**What gets created:**
+
+- EKS cluster with managed node groups
+- VPC with public/private subnets
+- RDS PostgreSQL instance
+- ECR repository for images
+- Security groups and IAM roles
+
+### Phase 2: Kubernetes Configuration
+
+```bash
+# Configure kubectl for the new cluster
+aws eks update-kubeconfig --name service-mgr-production
+
+# Verify connection
+kubectl get nodes
+kubectl get pods -A
+```
+
+### Phase 3: Monitoring Stack
+
+```bash
+# Add Helm repositories
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+# Install monitoring stack
+helm install monitoring prometheus-community/kube-prometheus-stack \
+  -f monitoring/values.yaml \
+  -n monitoring --create-namespace
+
+# Verify monitoring components
+kubectl get pods -n monitoring
+kubectl get svc -n monitoring
+```
+
+### Phase 4: Application Deployment (GitOps)
+
+```bash
+# Create GitOps repository (separate from main repo)
+# Copy charts/service-mgr/ to your gitops repo
+
+# Apply ArgoCD application
+kubectl apply -f argocd/application.yaml
+
+# Monitor deployment
+kubectl get applications -n argocd
+kubectl get pods -n service-mgr
+```
+
+## 🔧 Configuration Management
+
+### Environment Variables
+
+Create secrets for sensitive data:
 
 ```bash
 # Database credentials
-kubectl create secret generic service-mgr-db-secret \
-  --from-literal=username=postgres \
-  --from-literal=password=your-password \
-  -n service-mgr
-
-# JWT secret
-kubectl create secret generic service-mgr-jwt-secret \
-  --from-literal=secret=your-jwt-secret \
+kubectl create secret generic service-mgr-secrets \
+  --from-literal=database-url="postgresql://servicemgr:password@rds-endpoint:5432/servicemgr" \
+  --from-literal=jwt-secret="your-super-secret-key" \
+  --from-literal=redis-url="redis://redis-service:6379" \
   -n service-mgr
 ```
 
-### Ingress Setup
+### Helm Values Override
 
-For external access, configure ingress:
+For production overrides:
 
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: service-mgr-ingress
-  namespace: service-mgr
-  annotations:
-    kubernetes.io/ingress.class: nginx
-spec:
-  rules:
-  - host: your-domain.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: service-mgr-frontend
-            port:
-              number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: service-mgr-node-api
-            port:
-              number: 8081
+# charts/service-mgr/values-production.yaml
+api:
+  replicaCount: 3
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+postgresql:
+  enabled: false  # Use external RDS
+
+ingress:
+  hosts:
+    - host: your-domain.com
 ```
 
-## API Documentation
+## 📊 Monitoring & Observability
 
-Interactive Swagger UI available at `/api-docs` (future).
+### Accessing Grafana
 
-Current endpoints:
+```bash
+# Get Grafana admin password
+kubectl get secret monitoring-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 --decode
 
-### Auth
+# Port forward Grafana
+kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
 
-- `POST /api/v1/auth/login` – Login
-- `POST /api/v1/auth/register` – Register (Admin only)
+# Access at: http://localhost:3000
+# Username: admin
+# Password: (from above command)
+```
 
-### Customers
+### Key Dashboards
 
-- `GET /api/v1/customers` – List (paginated, searchable)
-- `POST /api/v1/customers` – Create
-- `GET /api/v1/customers/:id` – Detail (360 view)
-- `PUT /api/v1/customers/:id` – Update
-- `DELETE /api/v1/customers/:id` – Delete
+- **Kubernetes / Compute Resources**: Cluster resource usage
+- **Kubernetes / API Server**: API server performance
+- **Service Manager**: Custom application metrics
+- **PostgreSQL**: Database performance metrics
 
-### Jobs
+### Alerting
 
-- `GET /api/v1/jobs` – List (filterable)
-- `POST /api/v1/jobs` – Create
-- `GET /api/v1/jobs/:id` – Detail
-- `PATCH /api/v1/jobs/:id` – Update
-- `DELETE /api/v1/jobs/:id` – Delete
+Configured alerts for:
 
-### Staff
+- Pod restarts in service-mgr namespace
+- High memory/CPU usage
+- Service downtime
+- Database connection errors
+- Slow API responses
 
-- `GET /api/v1/staff` – List
-- `POST /api/v1/staff` – Create (Admin)
-- `PUT /api/v1/staff/:id` – Update (Admin)
-- `DELETE /api/v1/staff/:id` – Delete (Admin)
+## 🔒 Security Best Practices
 
-### Invoices
+### Container Security
 
-- `GET /api/v1/invoices` – List
-- `POST /api/v1/invoices` – Create
-- `PATCH /api/v1/invoices/:id` – Update status
+- **Non-root users**: All containers run as UID 1001
+- **Minimal base images**: Alpine Linux for smaller attack surface
+- **Read-only filesystems**: Where applicable
+- **Security contexts**: Pod and container security policies
 
-### Services
+### Network Security
 
-- `GET /api/v1/services` – List
-- `POST /api/v1/services` – Create (Admin)
-- `PUT /api/v1/services/:id` – Update (Admin)
+- **Private subnets**: Application components in private subnets
+- **Security groups**: Least-privilege access rules
+- **Network policies**: Inter-pod communication controls
+- **TLS termination**: Ingress handles SSL/TLS
 
-### Dashboard
+### Access Control
 
-- `GET /api/v1/dashboard` – Overview stats
-- `GET /api/v1/dashboard/today` – Today’s schedule
-- `GET /api/v1/dashboard/overdue` – Overdue jobs
-- `GET /api/v1/dashboard/customers/:id` – Customer 360
+- **RBAC**: Role-based access for Kubernetes resources
+- **Service accounts**: Component-specific identities
+- **Secret management**: External secrets, no hardcoded credentials
+- **IAM roles**: Least-privilege AWS permissions
 
-### Reporting
+## CI/CD Workflow
 
-- `GET /api/v1/reporting/jobs-per-week` – Weekly job counts
-- `GET /api/v1/reporting/revenue-by-service` – Revenue breakdown
-- `GET /api/v1/reporting/jobs-by-status` – Status distribution
+### Automatic Pipeline
 
-### Tasks (Worker)
+1. **Push to main**: Triggers GitHub Actions
+2. **Build**: Creates Docker images with SHA tags
+3. **Test**: Runs unit and integration tests
+4. **Security**: Scans for vulnerabilities
+5. **GitOps Update**: Updates manifest repository
+6. **ArgoCD Sync**: Automatically deploys to production
 
-- `GET /api/v1/tasks` – List pending tasks (Admin)
-- `PATCH /api/v1/tasks/:id` – Update status
+### Manual Deployment
 
-### Audit
+```bash
+# Force rebuild and deploy
+./automate.sh full-deploy
 
-- `GET /api/v1/audit` – Audit log (Admin)
+# Update specific component
+kubectl rollout restart deployment/service-mgr-api -n service-mgr
 
-## Security Best Practices
+# Rollback if needed
+kubectl rollout undo deployment/service-mgr-api -n service-mgr
+```
 
-1. **Secrets Management**: Use Kubernetes Secrets or external vault (e.g., HashiCorp Vault)
-2. **Network Policies**: Restrict pod-to-pod communication
-3. **TLS**: Terminate at ingress (cert‑manager)
-4. **RBAC**: Least privilege for service accounts
-5. **Backups**: Automated PostgreSQL backups with tested restore
-6. **Updates**: Regular dependency updates (Dependabot)
-7. **Scanning**: Container image scanning (Trivy)
+## Scaling & Performance
 
-## Roadmap
+### Horizontal Scaling
 
-- [ ] Mobile app (React Native)
-- [ ] Customer portal (self‑service booking)
-- [ ] SMS/email integrations (Twilio, SendGrid)
-- [ ] Inventory management
-- [ ] QuickBooks/Xero integration
-- [ ] Multi‑tenant support
-- [ ] Advanced analytics dashboard
+```bash
+# Scale API pods
+kubectl scale deployment service-mgr-api --replicas=5 -n service-mgr
+
+# Scale worker pods
+kubectl scale deployment service-mgr-worker --replicas=3 -n service-mgr
+```
+
+### Vertical Scaling
+
+Update Helm values and redeploy:
+
+```yaml
+api:
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 1Gi
+```
+
+### Database Scaling
+
+- RDS supports automated scaling
+- Read replicas for high availability
+- Connection pooling via application
+
+## 🔍 Troubleshooting
+
+### Application Issues
+
+```bash
+# Check pod status
+kubectl get pods -n service-mgr
+
+# View logs
+kubectl logs -f deployment/service-mgr-api -n service-mgr
+kubectl logs -f deployment/service-mgr-frontend -n service-mgr
+
+# Debug containers
+kubectl exec -it deployment/service-mgr-api -n service-mgr -- /bin/sh
+```
+
+### Infrastructure Issues
+
+```bash
+# Check cluster status
+kubectl cluster-info
+kubectl get nodes
+
+# Verify AWS resources
+aws eks describe-cluster --name service-mgr-production
+aws rds describe-db-instances --db-instance-identifier service-mgr-postgres
+```
+
+### Monitoring Issues
+
+```bash
+# Check Prometheus targets
+kubectl port-forward svc/monitoring-prometheus-operated -n monitoring 9090:9090
+# Visit: http://localhost:9090/targets
+
+# Check Grafana
+kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
+# Visit: http://localhost:3000
+```
+
+## 📚 Additional Resources
+
+- [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
+- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws)
+- [Helm Documentation](https://helm.sh/docs/)
+- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
+- [Prometheus Documentation](https://prometheus.io/docs/)
 
 ## Contributing
 
-1. Fork the repo
+1. Fork the repository
 2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+3. Make changes following the established patterns
+4. Update documentation
+5. Submit a pull request
+
+## Support
+
+For production support:
+
+- Check application logs
+- Monitor Grafana dashboards
+- Review Alertmanager notifications
+- Create GitHub issues for bugs
+
+---
+
+**Your Service Manager application now has enterprise-grade DevOps infrastructure!**
+
+This setup provides production-ready CI/CD, GitOps deployment, comprehensive monitoring, and scalable infrastructure that can grow with your application needs.

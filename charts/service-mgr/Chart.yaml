@@ -1,0 +1,17 @@
+apiVersion: v2
+name: service-mgr
+description: Service Manager application Helm chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - service-management
+  - jobs
+  - invoices
+  - customers
+home: https://github.com/victornwoke/service-mgr
+sources:
+  - https://github.com/victornwoke/service-mgr
+maintainers:
+  - name: Victor Nwoke
+    email: victornwoke@example.com

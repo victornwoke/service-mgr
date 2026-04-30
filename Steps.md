@@ -6,18 +6,36 @@ This guide provides detailed step-by-step instructions for setting up, developin
 
 ### Prerequisites Check
 
+**For all deployment methods:**
+
 ```bash
 # Check if Docker is installed
 docker --version
 
 # Check if kubectl is available
 kubectl version --client
+```
 
+**For Terraform deployment (recommended):**
+
+```bash
+# Additional tools for Terraform
+kind --version          # Local Kubernetes clusters
+terraform --version     # Infrastructure as Code
+helm version           # Kubernetes package manager
+```
+
+**For existing Kubernetes cluster:**
+
+```bash
 # Check if you have access to a Kubernetes cluster
 kubectl cluster-info
+kubectl get nodes
 ```
 
 ### One-Command Setup
+
+***Option 1: Quick Kubernetes Deployment (Existing)***
 
 ```bash
 # Clone and deploy everything
@@ -27,7 +45,19 @@ chmod +x automate.sh setup-db.sh
 ./automate.sh full-deploy
 ```
 
-**That's it!** Your application will be running at `http://127.0.0.1:8080`
+**Access:** `http://127.0.0.1:8080`
+
+***Option 2: Terraform Local Environment (Recommended)**
+
+```bash
+# Clone and deploy with Terraform
+git clone <repository-url>
+cd service-mgr
+chmod +x deploy-local.sh
+./deploy-local.sh deploy
+```
+
+**Access:** `http://localhost:30080` (Frontend) / `http://localhost:30081` (API)
 
 ---
 
@@ -124,6 +154,112 @@ python worker.py
 docker-compose up -d
 ```
 
+#### Option C: Terraform Local Environment (Recommended)
+
+For a **production-like local development environment** with automated CI/CD:
+
+```bash
+# 1. Deploy complete environment
+./deploy-local.sh deploy
+
+# 2. Access application
+# Frontend: http://localhost:30080
+# API: http://localhost:30081
+
+# 3. Check status
+./deploy-local.sh status
+
+# 4. Clean up when done
+./deploy-local.sh destroy
+```
+
+**What you get:**
+
+- ✅ Kind Kubernetes cluster (local)
+- ✅ PostgreSQL with persistent storage
+- ✅ All application components (API, Frontend, Worker)
+- ✅ NGINX ingress controller
+- ✅ Health checks and monitoring
+- ✅ **CORS properly configured**
+- ✅ Isolated from host system
+
+**Customize ports if needed:**
+
+```bash
+terraform apply -var="frontend_port=8080" -var="api_port=8081"
+```
+
+#### Option D: Full CI/CD Pipeline (Enterprise)
+
+For **automated deployments** with GitOps and ArgoCD:
+
+```bash
+# 1. Set up GitOps repository
+./scripts/setup-gitops.sh
+
+# 2. Create GitOps repository on GitHub
+# Copy generated files to: https://github.com/YOUR_USERNAME/service-mgr-gitops
+
+# 3. Configure ArgoCD applications
+kubectl apply -f argocd/staging-app.yaml
+kubectl apply -f argocd/production-app.yaml
+
+# 4. Push code to trigger deployments
+git push origin main    # Production deployment
+git push origin develop # Staging deployment
+```
+
+**CI/CD Features:**
+
+- ✅ **SHA-based immutable tagging** (security & traceability)
+- ✅ Multi-environment deployments (staging/production)
+- ✅ Automated security scanning (Trivy)
+- ✅ GitOps with ArgoCD (automated sync)
+- ✅ Comprehensive testing (backend & frontend)
+- ✅ Rollback capabilities with full SHA tracking
+
+For a complete, production-like local development environment with Kubernetes:
+
+```bash
+# 1. Prerequisites (Docker, kubectl, kind, terraform, helm)
+docker --version
+kubectl version --client
+kind --version
+terraform --version
+helm version
+
+# 2. Deploy complete environment
+./deploy-local.sh deploy
+
+# 3. Access application
+# Frontend: http://localhost:30080
+# API: http://localhost:30081
+
+# 4. Check status
+./deploy-local.sh status
+
+# 5. View logs
+kubectl logs -f deployment/service-mgr-frontend -n service-mgr
+kubectl logs -f deployment/service-mgr-node-api -n service-mgr
+```
+
+**What you get:**
+
+- ✅ Kind Kubernetes cluster (local)
+- ✅ PostgreSQL with persistent storage
+- ✅ All application components (API, Frontend, Worker)
+- ✅ NGINX ingress controller
+- ✅ Health checks and monitoring
+- ✅ Isolated from host system
+- ✅ Production-like configuration
+
+**Customize ports if needed:**
+
+```bash
+# Edit terraform-local/local.auto.tfvars or use variables
+terraform apply -var="frontend_port=8080" -var="api_port=8081"
+```
+
 ### Development Commands
 
 #### Backend Development
@@ -191,7 +327,9 @@ npm run lint
 
 ## Production Deployment
 
-### Automated Deployment (Recommended)
+### Automated Deployment Options
+
+#### Option A: Script-Based Deployment (Recommended for Production)
 
 ```bash
 # Full production deployment
@@ -202,6 +340,74 @@ npm run lint
 ./automate.sh deploy        # Deploy to K8s
 ./automate.sh health        # Run health checks
 ```
+
+#### Option B: Terraform Infrastructure as Code (Recommended for Development/Testing)
+
+For production-like testing with infrastructure automation and **guaranteed consistency**:
+
+```bash
+# Local development with Terraform (terraform-local/)
+cd terraform-local
+./deploy-local.sh deploy    # Includes CORS validation
+
+# Or manual Terraform commands
+terraform init
+terraform apply
+
+# Production AWS deployment (terraform/)
+cd ../terraform
+terraform init
+terraform plan -var="db_username=servicemgr" -var="db_password=your-secure-password"
+terraform apply -var="db_username=servicemgr" -var="db_password=your-secure-password"
+```
+
+**Benefits of Terraform:**
+
+- ✅ Infrastructure as Code
+- ✅ Version-controlled infrastructure
+- ✅ **Consistent CORS configuration** (prevents deployment issues)
+- ✅ Automatic validation of critical settings
+- ✅ Easy scaling and replication
+- ✅ Audit trail of changes
+
+#### Option C: GitOps CI/CD Pipeline (Enterprise Grade)
+
+For **fully automated deployments** with immutable SHA-based tagging:
+
+```bash
+# 1. Set up GitOps repository
+./scripts/setup-gitops.sh
+
+# 2. Create GitOps repository on GitHub
+# Copy files to: https://github.com/YOUR_USERNAME/service-mgr-gitops
+
+# 3. Configure ArgoCD
+kubectl apply -f argocd/staging-app.yaml
+kubectl apply -f argocd/production-app.yaml
+
+# 4. Set up GitHub secrets
+./scripts/setup-github-secrets.sh    # Interactive setup guide
+# Required secrets:
+# - GITOPS_TOKEN: Personal access token for GitOps repo
+# - DB_POSTGRES_PASSWORD: Database admin password
+# - DB_USERNAME: Database username
+# - DB_PASSWORD: Database user password
+# - DB_NAME: Database name
+
+# 5. Push code to trigger automated deployments
+git push origin main    # Production deployment via ArgoCD
+git push origin develop # Staging deployment via ArgoCD
+```
+
+**Enterprise CI/CD Features:**
+
+- ✅ **Immutable SHA-based tagging** (main-sha-abc123..., develop-sha-abc123...)
+- ✅ Multi-environment deployments (staging/production)
+- ✅ Automated security scanning (Trivy vulnerability scanner)
+- ✅ GitOps with ArgoCD (automated synchronization)
+- ✅ Comprehensive testing (backend + frontend)
+- ✅ Rollback capabilities (rollback to any SHA)
+- ✅ Audit trail with full commit traceability
 
 ### Manual Deployment Steps
 
@@ -345,6 +551,86 @@ kubectl delete pod -n service-mgr -l app=service-mgr-postgres
 
 #### Issue: CORS errors in browser
 
+**Solution (Terraform deployments):**
+CORS is now automatically configured and validated during deployment.
+
+```bash
+# Check CORS configuration
+kubectl get configmap service-mgr-config -n service-mgr -o yaml | grep CORS_ORIGINS
+
+# Restart API if needed
+kubectl rollout restart deployment/service-mgr-node-api -n service-mgr
+
+# Hard refresh browser: Ctrl+Shift+R (Chrome/Edge) or Ctrl+F5 (Firefox)
+```
+
+**Custom CORS origins:**
+
+```bash
+terraform apply -var="cors_origins=http://localhost:30080,http://mycustomdomain.com"
+```
+
+#### Issue: GitHub secrets not working
+
+**Secret Configuration Issues:**
+
+```bash
+# Test local secret configuration
+./scripts/test-github-secrets.sh
+
+# Run interactive setup
+./scripts/setup-github-secrets.sh
+
+# Check repository secrets
+# Go to: https://github.com/YOUR_REPO/settings/secrets/actions
+```
+
+**Common Secret Issues:**
+
+- `GITOPS_TOKEN`: Check token has `repo` and `workflow` permissions
+- `DB_*` secrets: Ensure all database secrets are set for production
+- Token expiration: Regenerate if expired
+- Repository access: Verify token has access to GitOps repository
+
+#### Issue: Terraform deployment fails
+
+**Local Terraform Issues:**
+
+```bash
+# Check Terraform prerequisites
+cd terraform-local
+terraform validate
+
+# If Docker daemon issues
+docker info
+
+# Clean up failed deployments
+terraform destroy
+kind delete clusters service-mgr-local
+
+# Restart fresh
+terraform init
+terraform apply
+```
+
+**Common Terraform fixes:**
+
+- Port conflicts: `terraform apply -var="frontend_port=8080"`
+- Resource issues: `docker system prune -a`
+- State issues: `rm terraform.tfstate* && terraform init`
+- **CORS validation fails**: Check that CORS_ORIGINS is set in config map
+
+**AWS Terraform Issues:**
+
+```bash
+cd terraform
+terraform validate
+aws eks update-kubeconfig --name service-mgr-production
+kubectl get nodes
+```
+
+#### Issue: CORS errors in browser*
+
 ```bash
 # Check if port forwarding is using correct IPs
 # Frontend should be accessible at 127.0.0.1:8080
@@ -398,6 +684,8 @@ kubectl delete namespace service-mgr
 
 ### Daily Operations
 
+**Script-based deployment:**
+
 ```bash
 # Check application status
 ./automate.sh status
@@ -409,6 +697,23 @@ kubectl delete namespace service-mgr
 # Monitor resources
 kubectl top pods -n service-mgr
 kubectl top nodes
+```
+
+**Terraform deployment:**
+
+```bash
+# Check status
+./deploy-local.sh status
+
+# View Terraform outputs
+cd terraform-local && terraform output
+
+# Monitor resources
+kubectl top pods -n service-mgr
+kubectl get nodes
+
+# Check Terraform state
+terraform show
 ```
 
 ### Database Maintenance
@@ -426,6 +731,8 @@ kubectl exec -n service-mgr deployment/service-mgr-postgres -- psql -U postgres 
 
 ### Updates & Upgrades
 
+**Script-based deployment:**
+
 ```bash
 # Update to latest version
 git pull origin main
@@ -438,9 +745,26 @@ git pull origin main
 kubectl rollout restart deployment -n service-mgr
 ```
 
+**Terraform deployment:**
+
+```bash
+# Update code
+git pull origin main
+
+# Update Terraform infrastructure
+cd terraform-local
+terraform plan    # Review changes
+terraform apply   # Apply updates
+
+# Or for AWS production
+cd ../terraform
+terraform plan -var="db_username=servicemgr" -var="db_password=your-password"
+terraform apply -var="db_username=servicemgr" -var="db_password=your-password"
+```
+
 ---
 
-## 🎯 Feature Walkthrough
+## Feature Walkthrough
 
 ### First Time User Setup
 
@@ -491,6 +815,35 @@ kubectl rollout restart deployment -n service-mgr
 
 ---
 
+## Choosing Your Deployment Method
+
+### Quick Decision Guide
+
+| Scenario | Recommended Method | Why |
+|----------|--------------------|-----|
+
+| **First-time setup** | Terraform Local (`./deploy-local.sh deploy`) | Complete environment, zero configuration |
+| **Rapid prototyping** | Docker Compose | Fastest startup, minimal dependencies |
+| **Full-stack development** | Individual services (npm/pip) | Best for active development |
+| **Production deployment** | Script-based (`./automate.sh full-deploy`) | Optimized for production |
+| **Infrastructure testing** | Terraform AWS | Infrastructure as Code, scalable |
+| **CI/CD integration** | Script-based | Easy automation |
+| **Learning Kubernetes** | Terraform Local | Production-like local environment |
+
+### Method Comparison
+
+| Feature            | Script (automate.sh) | Terraform Local                       | Docker Compose          | Manual Services              |
+|--------------------|----------------------|---------------------------------------|-------------------------|------------------------------|
+| **Setup Time**     | 10-15 min            | 5-10 min                              | 2-5 min                 | 5-10 min                     |
+| **Kubernetes**     | ✅ Full cluster      | ✅ Kind cluster                       | ❌                      | ❌                           |
+| **Persistence**    | ✅ Database          | ✅ Database                           | ✅ Database             | ❌                           |
+| **Production-like**| ✅ High              | ✅ High                               | ⚠️ Medium               | ❌ Low                       |
+| **Customization**  | ⚠️ Medium            | ✅ High                               | ⚠️ Medium               | ✅ High                      |
+| **Dependencies**   | Docker, kubectl      | Docker, kubectl, kind, terraform, helm| Docker, docker-compose. | Node.js, Python, PostgreSQL. |
+| **Best For**       | Production deployment| Development testing.                  | Quick prototyping.      | Active development           |
+
+---
+
 ## Support & Next Steps
 
 ### Getting Help
@@ -511,5 +864,30 @@ kubectl rollout restart deployment -n service-mgr
 - **Backups**: Set up automated database backups
 - **Monitoring**: Add logging and metrics collection
 - **Scaling**: Configure horizontal pod autoscaling
+- **Immutable Deployments**: Use SHA-based tagging for security and traceability
+- **Secrets Management**: Use Sealed Secrets or External Secrets Operator
+
+### SHA-Based Immutable Deployments
+
+This project implements **enterprise-grade immutable deployments** using SHA-based tagging:
+
+**Security Benefits:**
+
+- ✅ No mutable `latest` tags in production
+- ✅ Each deployment pinned to exact commit SHA
+- ✅ Tamper-evident through SHA verification
+- ✅ Complete audit trail of deployments
+
+**Tag Format:**
+
+- Production: `main-sha-{full-commit-sha}` (e.g., `main-sha-abc123...`)
+- Staging: `develop-sha-{full-commit-sha}` (e.g., `develop-sha-abc123...`)
+
+**Rollback Example:**
+
+```bash
+# Rollback to specific SHA
+kubectl set image deployment/api api=ghcr.io/user/service-mgr-api:main-sha-abc1234567890abcdef
+```
 
 Need help? Check the logs or create an issue in the repository!

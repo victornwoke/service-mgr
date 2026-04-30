@@ -1,0 +1,21 @@
+# Local development environment variables
+# Copy this file to local.auto.tfvars and customize for your environment
+# The local.auto.tfvars file is gitignored and should not be committed
+
+# Database credentials (change these for security in shared environments)
+postgres_password = "postgres"
+jwt_secret = "supersecretlocaljwtkey"
+
+# Port configuration (customize if ports are already in use)
+frontend_port = 30080
+api_port = 30081
+ingress_http_port = 30080
+ingress_https_port = 30443
+
+# Cluster configuration
+cluster_name = "service-mgr-local"
+namespace = "service-mgr"
+
+# Feature flags
+enable_ingress = true
+enable_monitoring = false
