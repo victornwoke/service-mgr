@@ -1,0 +1,38 @@
+global:
+  environment: production
+  commitSha: "64ed1e2a45025ae55ca46ba509bc7193d769708f"
+
+frontend:
+  image:
+    tag: "main-sha-64ed1e2a45025ae55ca46ba509bc7193d769708f"
+  replicaCount: 3
+
+api:
+  image:
+    tag: "main-sha-64ed1e2a45025ae55ca46ba509bc7193d769708f"
+  replicaCount: 3
+
+worker:
+  image:
+    tag: "main-sha-64ed1e2a45025ae55ca46ba509bc7193d769708f"
+  replicaCount: 2
+
+postgresql:
+  auth:
+    postgresPassword: "cG9zdGdyZXM="
+    username: "servicemgr"
+    password: "cG9zdGdyZXM="
+    database: "servicemgr"
+
+ingress:
+  hosts:
+    - host: service-mgr.local
+      paths:
+        - path: /
+          pathType: Prefix
+        - path: /api
+          pathType: Prefix
+  tls:
+    - secretName: service-mgr-tls
+      hosts:
+        - service-mgr.local

@@ -1,0 +1,37 @@
+global:
+  environment: staging
+
+frontend:
+  replicaCount: 1
+  image:
+    tag: "latest"
+
+api:
+  replicaCount: 1
+  image:
+    tag: "latest"
+
+worker:
+  replicaCount: 1
+  image:
+    tag: "latest"
+
+ingress:
+  enabled: true
+  hosts:
+    - host: staging.service-mgr.local
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-mgr-frontend
+              port:
+                number: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: service-mgr-api
+              port:
+                number: 8081
