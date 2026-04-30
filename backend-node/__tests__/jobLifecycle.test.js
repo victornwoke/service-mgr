@@ -79,6 +79,9 @@ describe('Job Lifecycle & Task Scheduling', () => {
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('Completed');
 
+    // Wait a bit for async task creation
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Verify follow-up task created
     const tasks = await Task.findAll();
     const followUpTasks = tasks.filter(t => t.type === 'follow_up' && t.payload.jobId === job.id);
@@ -104,6 +107,9 @@ describe('Job Lifecycle & Task Scheduling', () => {
       .patch(`/api/v1/jobs/${job.id}`)
       .set('Authorization', `Bearer ${authToken}`)
       .send({ status: 'Completed' });
+
+    // Wait a bit for async task creation
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     const followUpTasks = await Task.findAll({ where: { type: 'follow_up' } });
     expect(followUpTasks.length).toBe(1);
