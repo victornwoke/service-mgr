@@ -128,8 +128,8 @@ spec:
     spec:
       containers:
         - name: node-api
-          image: sirhumble07/sbms-api:latest
-          imagePullPolicy: IfNotPresent
+          image: sbms-api:local
+          imagePullPolicy: Never
           ports:
             - containerPort: 8081
           envFrom:
@@ -188,8 +188,8 @@ spec:
     spec:
       containers:
         - name: python-worker
-          image: sirhumble07/sbms-worker:latest
-          imagePullPolicy: IfNotPresent
+          image: sbms-worker:local
+          imagePullPolicy: Never
           command: ["python", "worker.py"]
           envFrom:
             - configMapRef:
@@ -221,8 +221,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: sirhumble07/sbms-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: sbms-frontend:local
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           envFrom:

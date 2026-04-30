@@ -42,7 +42,7 @@ SBMS replaces paper workflows and spreadsheets with a digital system for:
 
 ``` txt
 ┌─────────────────────────────────────────────────────────────┐
-│                    Kubernetes Cluster                       │
+│                    Production Stack                         │
 ├─────────────────────────────────────────────────────────────┤
 │  service-mgr-frontend     service-mgr-node-api             │
 │  ├─ Pod (React)          ├─ Pod (Node.js)                  │
@@ -69,8 +69,8 @@ SBMS replaces paper workflows and spreadsheets with a digital system for:
 ### Local Development
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# 1. Clone the repository
+git clone https://github.com/victornwoke/service-mgr.git
 cd service-mgr
 
 # Make scripts executable
@@ -349,14 +349,10 @@ An `Application` manifest is provided in `gitops/` for ArgoCD.
 
 ```bash
 # Database credentials
-kubectl create secret generic service-mgr-db-secret \
-  --from-literal=username=postgres \
-  --from-literal=password=your-password \
-  -n service-mgr
-
-# JWT secret
-kubectl create secret generic service-mgr-jwt-secret \
-  --from-literal=secret=your-jwt-secret \
+kubectl create secret generic service-mgr-secrets \
+  --from-literal=database-url="postgresql://servicemgr:password@rds-endpoint:5432/servicemgr" \
+  --from-literal=jwt-secret="your-super-secret-key" \
+  --from-literal=redis-url="redis://redis-service:6379" \
   -n service-mgr
 ```
 
@@ -481,7 +477,7 @@ Current endpoints:
 - [ ] Multi‑tenant support
 - [ ] Advanced analytics dashboard
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repo
 2. Create a feature branch

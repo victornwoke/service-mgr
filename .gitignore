@@ -1,17 +1,73 @@
+# Dependencies
 node_modules/
-dist/
-build/
-.env
-*.log
-.DS_Store
 __pycache__/
-venv/
-.pytest_cache/
-node_modules/
-*.tar
-*.pid
-.DS_Store
 venv/
 .venv/
-__pycache__/
+.pytest_cache/
+
+# Build outputs
+dist/
+build/
+*.tar
+*.tgz
+
+# Environment files
 .env
+.env.local
+.env.production
+.env.staging
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE files
+.vscode/
+.idea/
+*.tmp
+*.bak
+
+# Process files
+*.pid
+
+# Kilo configuration
+.kilo
+
+# Terraform
+terraform-local/local.auto.tfvars
+terraform-local/.terraform/
+terraform-local/terraform.tfstate*
+terraform-local/terraform.tfstate.backup
+terraform/.terraform/
+terraform/terraform.tfstate*
+terraform/terraform.tfstate.backup
+
+# GitOps repository structure (if copied locally)
+gitops-repo-structure/
+
+# CI/CD artifacts
+.github/workflows/*.log
+coverage/
+.nyc_output/
+
+# Docker
+.dockerignore
+
+# Helm
+charts/*/charts/
+charts/*/tmpcharts/
+
+# ArgoCD
+argocd/applications/*/secrets.yaml
+argocd/applications/*/secrets.enc.yaml
+
+docs/

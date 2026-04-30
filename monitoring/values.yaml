@@ -1,0 +1,178 @@
+# Kube Prometheus Stack values override for Service Manager
+
+kubePrometheusStack:
+  enabled: true
+
+  # Alertmanager configuration
+  alertmanager:
+    enabled: true
+    config:
+      global:
+        smtp_smarthost: 'smtp.gmail.com:587'
+        smtp_from: 'alerts@service-mgr.com'
+        smtp_auth_username: 'victor.nwoke1989@gmail.com'
+        smtp_auth_password: 'your-app-password'
+      route:
+        group_by: ['alertname']
+        group_wait: 10s
+        group_interval: 10s
+        repeat_interval: 1h
+        receiver: 'email-notifications'
+        routes:
+        - match:
+            alertname: PodRestarts
+          receiver: 'email-notifications'
+      receivers:
+      - name: 'email-notifications'
+        email_configs:
+        - to: 'admin@service-mgr.com'
+          send_resolved: true
+
+  # Prometheus configuration
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      retention: 30d
+      retentionSize: "50GB"
+      ruleSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      ruleSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-prometheus-stack-prometheus
+      serviceMonitorSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-prometheus-stack-prometheus
+      podMonitorSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-prometheus-stack-prometheus
+      probeSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-prometheus-stack-prometheus
+
+  # Grafana configuration
+  grafana:
+    enabled: true
+    adminPassword: "admin123"  # Change this in production
+    ingress:
+      enabled: true
+      hosts:
+        - grafana.service-mgr.local
+    additionalDataSources:
+      - name: Prometheus
+        type: prometheus
+        url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+        access: proxy
+        isDefault: true
+
+  # Prometheus rules
+  prometheusRule:
+    enabled: true
+    rules:
+      - alert: PodRestarts
+        expr: increase(kube_pod_container_status_restarts_total{namespace="service-mgr"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          namespace: service-mgr
+        annotations:
+          summary: "Pod restarted in service-mgr namespace"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has restarted {{ $value }} times in the last 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes{namespace="service-mgr"} / container_spec_memory_limit_bytes) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in service-mgr"
+          description: "Container {{ $labels.container }} is using {{ $value }}% of its memory limit."
+
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{namespace="service-mgr"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage in service-mgr"
+          description: "Container {{ $labels.container }} is using high CPU."
+
+      - alert: ServiceDown
+        expr: up{namespace="service-mgr"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} in namespace {{ $labels.namespace }} is down."
+
+# Service Monitors for Service Manager components
+serviceMonitors:
+  - name: service-mgr-api
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: service-mgr
+        app.kubernetes.io/component: api
+    endpoints:
+      - port: http
+        path: /metrics
+        interval: 30s
+        scrapeTimeout: 10s
+
+  - name: service-mgr-frontend
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: service-mgr
+        app.kubernetes.io/component: frontend
+    endpoints:
+      - port: http
+        path: /metrics
+        interval: 30s
+        scrapeTimeout: 10s
+
+  - name: service-mgr-worker
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: service-mgr
+        app.kubernetes.io/component: worker
+    endpoints:
+      - port: http
+        path: /metrics
+        interval: 30s
+        scrapeTimeout: 10s
+
+# Pod Monitors (if you add metrics endpoints to pods)
+podMonitors: []
+
+# Additional Prometheus rules
+additionalPrometheusRules:
+  - name: service-mgr-rules
+    groups:
+      - name: service-mgr
+        rules:
+          - alert: APISlowResponse
+            expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="service-mgr", service="api"}[5m])) > 2
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "API response time is slow"
+              description: "95th percentile of API response time is {{ $value }}s"
+
+          - alert: DatabaseConnectionErrors
+            expr: rate(postgres_connection_errors_total{namespace="service-mgr"}[5m]) > 5
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High database connection errors"
+              description: "Database connection errors are {{ $value }}/second"
+
+# Enable node exporter for system metrics
+nodeExporter:
+  enabled: true
+
+# Enable kube state metrics for Kubernetes object metrics
+kubeStateMetrics:
+  enabled: true

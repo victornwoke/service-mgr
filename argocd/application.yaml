@@ -1,0 +1,79 @@
+# Staging Environment Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: service-mgr-staging
+  namespace: argocd
+  labels:
+    environment: staging
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/victornwoke/service-mgr-gitops
+    targetRevision: HEAD
+    path: charts/service-mgr
+    helm:
+      valueFiles:
+        - values.yaml
+        - ../../environments/staging/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: service-mgr-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+---
+# Production Environment Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: service-mgr-production
+  namespace: argocd
+  labels:
+    environment: production
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/victornwoke/service-mgr-gitops
+    targetRevision: HEAD
+    path: charts/service-mgr
+    helm:
+      valueFiles:
+        - values.yaml
+        - ../../environments/production/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: service-mgr
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
