@@ -2,7 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const apiRouter = require('./routes');
+const apiRouter = require('./routes/v1');
 const { sequelize } = require('./models');
 const { generalLimiter } = require('./middleware/rateLimit');
 const { requestLogger, recordMetrics } = require('./middleware/logger');

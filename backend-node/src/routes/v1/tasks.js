@@ -1,9 +1,9 @@
 // src/routes/v1/tasks.js
 const express = require('express');
 const router = express.Router();
-const { Task } = require('../models');
+const { Task } = require('../../models');
 const Joi = require('joi');
-const { authenticate, authorize } = require('../middleware/auth');
+const { authenticate, authorize } = require('../../middleware/auth');
 
 const taskSchema = Joi.object({
   type: Joi.string().valid('job_reminder', 'follow_up', 'daily_summary').required(),
@@ -21,7 +21,7 @@ const handleError = (res, err) => {
     });
   }
   // Handle Sequelize validation errors
-  if err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError' {
+  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
     return res.status(400).json({
       code: 'VALIDATION_ERROR',
       message: 'Validation failed',

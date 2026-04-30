@@ -1,7 +1,7 @@
 // src/routes/invoices.js
 const express = require('express');
 const router = express.Router();
-const invoicesController = require('../controllers/invoicesController');
+const invoicesController = require('../../controllers/invoicesController');
 
 router.get('/', invoicesController.getAllInvoices);
 router.get('/:id', invoicesController.getInvoiceById);
