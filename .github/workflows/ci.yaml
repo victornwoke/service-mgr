@@ -25,6 +25,10 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     outputs:
       frontend-image: ${{ steps.meta-frontend.outputs.tags }}
       api-image: ${{ steps.meta-backend.outputs.tags }}
@@ -176,6 +180,9 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     needs: build-and-test
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout repository
@@ -198,10 +205,11 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     needs: [build-and-test, test, security-scan]
-    if: >
-      github.ref == 'refs/heads/develop' ||
-      github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
     environment: staging
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - name: Checkout repository
@@ -272,11 +280,11 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     needs: [build-and-test, test, security-scan]
-    if: >
-      github.ref == 'refs/heads/main' ||
-      (github.event_name == 'workflow_dispatch' &&
-       github.event.inputs.environment == 'production')
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
     environment: production
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - name: Checkout repository
