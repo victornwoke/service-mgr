@@ -23,7 +23,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   GITOPS_REPO: victornwoke/service-mgr-gitops
-  ENVIRONMENT: ${{ github.event.inputs.environment || github.event.client_payload.environment || (github.ref == 'refs/heads/main' && 'production') || (github.ref == 'refs/heads/develop' && 'staging') || 'staging' }}
 
 jobs:
   build-and-test:
@@ -232,7 +231,7 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     needs: [build-and-test, test, security-scan]
-    if: ${{ env.ENVIRONMENT == 'staging' }}
+    if: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.environment == 'staging' || github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging' }}
     environment: staging
     permissions:
       contents: read
@@ -308,7 +307,7 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     needs: [build-and-test, test, security-scan]
-    if: ${{ env.ENVIRONMENT == 'production' }}
+    if: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.environment == 'production' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' }}
     environment: production
     permissions:
       contents: read
