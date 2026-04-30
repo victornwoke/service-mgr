@@ -35,19 +35,19 @@ kubectl get nodes
 
 ### One-Command Setup
 
-***Option 1: Quick Kubernetes Deployment (Existing)***
+***Option 1: Terraform Local Environment (Recommended)***
 
 ```bash
-# Clone and deploy everything
+# Clone and deploy everything with Terraform
 git clone <repository-url>
 cd service-mgr
-chmod +x automate.sh setup-db.sh
+chmod +x automate.sh
 ./automate.sh full-deploy
 ```
 
-**Access:** `http://127.0.0.1:8080`
+**Access:** `http://127.0.0.1:30080` (frontend), `http://127.0.0.1:30081` (API)
 
-***Option 2: Terraform Local Environment (Recommended)**
+***Option 2: Existing Kubernetes Cluster***
 
 ```bash
 # Clone and deploy with Terraform
@@ -346,11 +346,15 @@ npm run lint
 For production-like testing with infrastructure automation and **guaranteed consistency**:
 
 ```bash
-# Local development with Terraform (terraform-local/)
-cd terraform-local
-./deploy-local.sh deploy    # Includes CORS validation
+# Full automated deployment with Terraform
+./automate.sh full-deploy
 
-# Or manual Terraform commands
+# Or specific Terraform commands
+./automate.sh terraform-deploy    # Deploy local cluster
+./automate.sh terraform-destroy   # Destroy local cluster
+
+# Manual Terraform commands (terraform-local/)
+cd terraform-local
 terraform init
 terraform apply
 
@@ -822,10 +826,10 @@ terraform apply -var="db_username=servicemgr" -var="db_password=your-password"
 | Scenario | Recommended Method | Why |
 |----------|--------------------|-----|
 
-| **First-time setup** | Terraform Local (`./deploy-local.sh deploy`) | Complete environment, zero configuration |
+| **First-time setup** | Terraform Local (`./automate.sh full-deploy`) | Complete environment, zero configuration |
 | **Rapid prototyping** | Docker Compose | Fastest startup, minimal dependencies |
 | **Full-stack development** | Individual services (npm/pip) | Best for active development |
-| **Production deployment** | Script-based (`./automate.sh full-deploy`) | Optimized for production |
+| **Production deployment** | Terraform Local | Optimized for production |
 | **Infrastructure testing** | Terraform AWS | Infrastructure as Code, scalable |
 | **CI/CD integration** | Script-based | Easy automation |
 | **Learning Kubernetes** | Terraform Local | Production-like local environment |
@@ -834,12 +838,12 @@ terraform apply -var="db_username=servicemgr" -var="db_password=your-password"
 
 | Feature            | Script (automate.sh) | Terraform Local                       | Docker Compose          | Manual Services              |
 |--------------------|----------------------|---------------------------------------|-------------------------|------------------------------|
-| **Setup Time**     | 10-15 min            | 5-10 min                              | 2-5 min                 | 5-10 min                     |
+| **Setup Time**     | 5-10 min             | 5-10 min                              | 2-5 min                 | 5-10 min                     |
 | **Kubernetes**     | ✅ Full cluster      | ✅ Kind cluster                       | ❌                      | ❌                           |
 | **Persistence**    | ✅ Database          | ✅ Database                           | ✅ Database             | ❌                           |
 | **Production-like**| ✅ High              | ✅ High                               | ⚠️ Medium               | ❌ Low                       |
 | **Customization**  | ⚠️ Medium            | ✅ High                               | ⚠️ Medium               | ✅ High                      |
-| **Dependencies**   | Docker, kubectl      | Docker, kubectl, kind, terraform, helm| Docker, docker-compose. | Node.js, Python, PostgreSQL. |
+| **Dependencies**   | Docker, kubectl, terraform | Docker, kubectl, kind, terraform, helm| Docker, docker-compose. | Node.js, Python, PostgreSQL. |
 | **Best For**       | Production deployment| Development testing.                  | Quick prototyping.      | Active development           |
 
 ---

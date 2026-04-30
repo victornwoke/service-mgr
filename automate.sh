@@ -61,9 +61,9 @@ check_prerequisites() {
         exit 1
     fi
 
-    # Check if kubectl can connect to cluster
-    if ! kubectl cluster-info &> /dev/null; then
-        log_error "Cannot connect to Kubernetes cluster"
+    # Check Terraform
+    if ! command -v terraform &> /dev/null; then
+        log_error "Terraform is not installed or not in PATH"
         exit 1
     fi
 
@@ -112,25 +112,43 @@ push_images() {
     log_success "All images pushed to registry"
 }
 
-# Deploy to Kubernetes
-deploy_k8s() {
-    log_header "Deploying to Kubernetes"
+# Deploy using Terraform
+deploy_terraform() {
+    log_header "Deploying with Terraform"
 
-    # Update image tags in manifests
-    log_info "Updating image tags in manifests..."
-    sed -i.bak "s|image: sirhumble07/sbms-api:.*|image: ${REGISTRY}/sbms-api:${TAG}|g" k8s/service-mgr.yaml
-    sed -i.bak "s|image: sirhumble07/sbms-frontend:.*|image: ${REGISTRY}/sbms-frontend:${TAG}|g" k8s/service-mgr.yaml
-    sed -i.bak "s|image: sirhumble07/sbms-worker:.*|image: ${REGISTRY}/sbms-worker:${TAG}|g" k8s/service-mgr.yaml
+    cd terraform-local
 
-    # Apply RBAC resources
-    log_info "Applying RBAC resources..."
-    kubectl apply -f k8s/rbac.yaml
+    log_info "Initializing Terraform..."
+    terraform init
 
-    # Apply main manifests
-    log_info "Applying Kubernetes manifests..."
-    kubectl apply -f k8s/service-mgr.yaml
+    log_info "Planning Terraform deployment..."
+    terraform plan
 
-    log_success "Deployment initiated"
+    log_info "Applying Terraform deployment..."
+    terraform apply -auto-approve
+
+    cd ..
+    log_success "Terraform deployment completed"
+}
+
+# Destroy using Terraform
+destroy_terraform() {
+    log_header "Destroying with Terraform"
+
+    cd terraform-local
+
+    log_warning "This will destroy the entire local cluster and all resources!"
+    read -p "Are you sure? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        log_info "Destroying Terraform resources..."
+        terraform destroy -auto-approve
+        log_success "Terraform destroy completed"
+    else
+        log_info "Destroy cancelled"
+    fi
+
+    cd ..
 }
 
 # Wait for rollout completion
@@ -323,14 +341,18 @@ main() {
             wait_for_rollout
             health_check
             ;;
+        terraform-deploy)
+            check_prerequisites
+            deploy_terraform
+            ;;
+        terraform-destroy)
+            destroy_terraform
+            ;;
         full-deploy)
             check_prerequisites
             build_all
             push_images
-            deploy_k8s
-            wait_for_rollout
-            health_check
-            show_status
+            deploy_terraform
             ;;
         status)
             show_status
@@ -373,20 +395,22 @@ Service Manager - Complete DevOps Automation Script
 USAGE:
     $0 <command> [options]
 
-COMMANDS:
-    build           Build all components and push images
-    deploy          Deploy to Kubernetes (assumes images exist)
-    full-deploy     Complete pipeline: build + deploy + health checks
-    status          Show application status
-    health          Run health checks
-    start           Start application (scale up)
-    stop            Stop application (scale down)
-    restart         Restart all deployments
-    logs <comp>     Show logs for component (api/frontend/worker)
-    backup          Create database backup
-    restore <file>  Restore database from backup file
-    cleanup         Delete all resources (DANGER!)
-    help            Show this help
+ COMMANDS:
+    build               Build all components and push images
+    deploy              Deploy to Kubernetes (assumes images exist)
+    terraform-deploy    Deploy using Terraform (sets up local cluster)
+    terraform-destroy   Destroy Terraform resources (local cluster)
+    full-deploy         Complete pipeline: build + terraform-deploy
+    status              Show application status
+    health              Run health checks
+    start               Start application (scale up)
+    stop                Stop application (scale down)
+    restart             Restart all deployments
+    logs <comp>         Show logs for component (api/frontend/worker)
+    backup              Create database backup
+    restore <file>      Restore database from backup file
+    cleanup             Delete all resources (DANGER!)
+    help                Show this help
 
 ENVIRONMENT VARIABLES:
     REGISTRY        Docker registry (default: sirhumble07)
@@ -394,10 +418,12 @@ ENVIRONMENT VARIABLES:
     NAMESPACE       Kubernetes namespace (default: service-mgr)
     ENVIRONMENT     Environment (default: production)
 
-EXAMPLES:
-    $0 full-deploy              # Complete deployment pipeline
+ EXAMPLES:
+    $0 full-deploy              # Complete deployment pipeline (build + terraform)
     $0 build                    # Just build and push images
-    $0 deploy                   # Deploy existing images
+    $0 terraform-deploy         # Deploy with Terraform (local cluster)
+    $0 terraform-destroy        # Destroy local cluster
+    $0 deploy                   # Deploy with kubectl (existing cluster)
     $0 status                   # Check application status
     $0 logs api 100             # Show last 100 lines of API logs
     $0 restart                  # Rolling restart of all components

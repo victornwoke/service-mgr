@@ -76,17 +76,28 @@ cd service-mgr
 # Make scripts executable
 chmod +x automate.sh setup-db.sh
 
-# Full automated deployment
+# Full automated deployment (Terraform-based)
 ./automate.sh full-deploy
-```
 
 This will:
 
 - ✅ Build all Docker images
 - ✅ Push to registry
-- ✅ Deploy to Kubernetes
-- ✅ Set up database
+- ✅ Deploy using Terraform (sets up local Kind cluster)
 - ✅ Run health checks
+
+# Terraform Deployment Commands
+
+```bash
+# Deploy local cluster with application
+./automate.sh terraform-deploy
+
+# Destroy local cluster
+./automate.sh terraform-destroy
+
+# Full pipeline (build + terraform deploy)
+./automate.sh full-deploy
+```
 
 ### Manual Installation
 
