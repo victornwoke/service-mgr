@@ -140,7 +140,6 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready -U postgres -d test
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -162,19 +161,16 @@ jobs:
       - name: Run backend tests
         run: |
           cd backend-node
-          # Wait for database to be ready
+          # Simple wait for PostgreSQL to be ready
           echo "Waiting for PostgreSQL to be ready..."
           for i in {1..30}; do
-            if pg_isready -h localhost -p 5432 -U postgres -d test; then
+            if PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d test -c "SELECT 1;" >/dev/null 2>&1; then
               echo "PostgreSQL is ready!"
               break
             fi
             echo "Attempt $i: PostgreSQL not ready yet..."
             sleep 2
           done
-
-          # Verify database exists and create if needed
-          PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -l | grep test || PGPASSWORD=postgres createdb -h localhost -p 5432 -U postgres test
 
           echo "Starting tests..."
           npm test
