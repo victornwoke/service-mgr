@@ -22,3 +22,8 @@ provider "kubernetes" {
   client_certificate     = kind_cluster.service_mgr.client_certificate
   client_key             = kind_cluster.service_mgr.client_key
 }
+
+provider "github" {
+  owner = var.github_owner
+  token = var.github_token
+}

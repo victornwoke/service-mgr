@@ -17,6 +17,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.23"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 }
 
@@ -500,20 +504,41 @@ resource "kubernetes_deployment" "worker" {
             }
           }
 
-          resources {
-            requests = {
-              memory = "64Mi"
-              cpu    = "25m"
-            }
-            limits = {
-              memory = "128Mi"
-              cpu    = "100m"
-            }
-          }
-        }
-      }
-    }
-  }
+           resources {
+             requests = {
+               memory = "64Mi"
+               cpu    = "25m"
+             }
+             limits = {
+               memory = "128Mi"
+               cpu    = "100m"
+             }
+           }
+         }
+       }
+     }
+   }
 
-  depends_on = [kubernetes_service.postgres]
+   depends_on = [kubernetes_service.postgres]
+ }
+
+# Trigger GitHub Actions workflow for local testing
+resource "github_repository_dispatch" "trigger_ci_staging" {
+  repository = var.github_repository
+  event_type = "deploy"
+  client_payload = jsonencode({
+    environment = "staging"
+  })
+
+  depends_on = [kubernetes_deployment.worker]
+}
+
+resource "github_repository_dispatch" "trigger_ci_production" {
+  repository = var.github_repository
+  event_type = "deploy"
+  client_payload = jsonencode({
+    environment = "production"
+  })
+
+  depends_on = [kubernetes_deployment.worker]
 }

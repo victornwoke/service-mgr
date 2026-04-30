@@ -71,3 +71,21 @@ variable "cors_origins" {
   type        = string
   default     = "http://localhost:30080,http://127.0.0.1:30080,http://localhost:8080,http://127.0.0.1:8080,http://localhost:3000"
 }
+
+variable "github_owner" {
+  description = "GitHub repository owner"
+  type        = string
+  default     = "victornwoke"
+}
+
+variable "github_token" {
+  description = "GitHub personal access token"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_repository" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "service-mgr"
+}
